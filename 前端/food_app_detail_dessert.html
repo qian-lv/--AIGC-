@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 食谱详情页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .image-section {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .close-button {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 32px;
+            height: 32px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .close-button::after {
+            content: '';
+            width: 16px;
+            height: 12px;
+            background-color: #ff6b6b;
+            clip-path: polygon(100% 40%, 40% 40%, 40% 0%, 0% 50%, 40% 100%, 40% 60%, 100% 60%);
+        }
+        .bookmark-icon {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            background-color: #f2c94c;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bookmark-icon::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #ffffff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .user-info-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: rgba(26, 18, 11, 0.8);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            margin-right: 12px;
+        }
+        .user-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .user-text .recipe-by {
+            color: #ffffff;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        .user-text .username {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .arrow-right {
+            width: 20px;
+            height: 20px;
+            border-right: 2px solid #ffffff;
+            border-bottom: 2px solid #ffffff;
+            transform: rotate(-45deg);
+        }
+        .basic-info {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .recipe-title {
+            color: #000000;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .recipe-meta {
+            display: flex;
+            align-items: center;
+            color: #888888;
+            font-size: 14px;
+        }
+        .recipe-meta .time {
+            margin-right: 16px;
+        }
+        .function-buttons {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: #ffffff;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .function-item-link {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .function-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .function-item .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .function-item .text {
+            color: #000000;
+            font-size: 12px;
+        }
+        .heart-icon {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .heart-icon::before {
+            content: '❤';
+            font-size: 20px;
+            color: #ff6b6b;
+        }
+        .arrow-icon {
+            width: 25px;
+            height: 18px;
+            background-color: #ff6b6b;
+            clip-path: polygon(0 40%, 60% 40%, 60% 0%, 100% 50%, 60% 100%, 60% 60%, 0 60%);
+        }
+        .plus-icon {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .plus-icon::before,
+        .plus-icon::after {
+            content: '';
+            position: absolute;
+            background-color: #ff6b6b;
+        }
+        .plus-icon::before {
+            width: 16px;
+            height: 3px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .plus-icon::after {
+            width: 3px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .ingredients-section {
+            padding: 20px;
+            background-color: #ffffff;
+            flex: 1;
+        }
+        .ingredients-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .ingredients-header .title {
+            color: #000000;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .ingredients-header .count {
+            color: #f2c94c;
+            font-size: 14px;
+        }
+        .ingredient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .ingredient-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+        }
+        .ingredient-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .ingredient-name {
+            flex: 1;
+            color: #000000;
+            font-size: 14px;
+        }
+        .ingredient-amount {
+            color: #888888;
+            font-size: 14px;
+        }
+        .ios-indicator {
+            width: 134px;
+            height: 5px;
+            background-color: #000000;
+            border-radius: 2.5px;
+            margin: 8px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-section">
+        <a href="#" class="close-button" id="backButton"></a>
+        <div class="bookmark-icon"></div>
+        <div class="user-info-bar">
+            <div class="user-avatar"></div>
+            <div class="user-text">
+                <div class="recipe-by">Recipe by</div>
+                <div class="username">Amir-Zhen</div>
+            </div>
+            <div class="arrow-right"></div>
+        </div>
+    </div>
+    
+    <div class="basic-info">
+        <div class="recipe-title">法式甜点</div>
+        <div class="recipe-meta">
+            <div class="time">制作时长：40分钟</div>
+            <div class="rating">推荐指数：★★★★★★</div>
+        </div>
+    </div>
+    
+    <div class="function-buttons">
+        <div class="function-item">
+            <div class="icon">
+                <div class="heart-icon"></div>
+            </div>
+            <div class="text">个人收藏</div>
+        </div>
+        <div class="function-item">
+            <div class="icon">
+                <div class="arrow-icon"></div>
+            </div>
+            <div class="text">开始做饭</div>
+        </div>
+        <div class="function-item">
+            <div class="icon">
+                <div class="plus-icon"></div>
+            </div>
+            <div class="text">加入日程</div>
+        </div>
+    </div>
+    
+    <div class="ingredients-section">
+        <div class="ingredients-header">
+            <div class="title">食材</div>
+            <div class="count">5种</div>
+        </div>
+        <div class="ingredient-list">
+            <div class="ingredient-item">
+                <div class="ingredient-icon">🥚</div>
+                <div class="ingredient-name">鸡蛋</div>
+                <div class="ingredient-amount">3个</div>
+            </div>
+            <div class="ingredient-item">
+                <div class="ingredient-icon">🍚</div>
+                <div class="ingredient-name">面粉</div>
+                <div class="ingredient-amount">150g</div>
+            </div>
+            <div class="ingredient-item">
+                <div class="ingredient-icon">🥛</div>
+                <div class="ingredient-name">牛奶</div>
+                <div class="ingredient-amount">200ml</div>
+            </div>
+            <div class="ingredient-item">
+                <div class="ingredient-icon">🍬</div>
+                <div class="ingredient-name">糖</div>
+                <div class="ingredient-amount">100g</div>
+            </div>
+            <div class="ingredient-item">
+                <div class="ingredient-icon">🧈</div>
+                <div class="ingredient-name">黄油</div>
+                <div class="ingredient-amount">50g</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ios-indicator"></div>
+    <script src="navigation.js"></script>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮事件处理
+            const backButton = document.getElementById('backButton');
+            backButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (window.navigationStack) {
+                    const previousUrl = window.navigationStack.pop();
+                    if (previousUrl) {
+                        window.location.href = previousUrl;
+                    } else {
+                        window.location.href = 'food_app_home.html';
+                    }
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            });
+            
+            // 开始做饭按钮事件处理
+            const functionItems = document.querySelectorAll('.function-item');
+            functionItems.forEach(function(item) {
+                const textElement = item.querySelector('.text');
+                if (textElement && textElement.textContent === '开始做饭') {
+                    item.addEventListener('click', function() {
+                        if (window.navigationStack) {
+                            window.navigationStack.push(window.location.href);
+                        }
+                        window.location.href = 'food_app_video_call.html';
+                    });
+                    item.style.cursor = 'pointer';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

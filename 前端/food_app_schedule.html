@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 记录</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Helvetica Neue", Arial, sans-serif; background: #f0f0f0; color: #3b3b3b; min-height: 100vh; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
+        .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff4e3; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #3b3b3b; }
+        .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #3b3b3b; border-bottom: 2px solid #3b3b3b; transform: rotate(45deg); }
+        .header-title { font-size: 20px; font-weight: 700; }
+        .intro { padding: 20px; }
+        .intro-title { font-size: 24px; font-weight: 700; color: #d87e32; margin-bottom: 8px; }
+        .intro-text { font-size: 14px; color: #6f5f4f; line-height: 1.7; }
+        .card { margin: 0 20px 20px; background: #ffffff; border-radius: 24px; box-shadow: 0 14px 28px rgba(206, 163, 101, 0.12); padding: 20px; }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+        .calendar { display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 14px; }
+        .calendar-panel, .time-panel { background: #f7efe0; border-radius: 20px; padding: 14px; }
+        .calendar-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+        .calendar-cell { width: 100%; padding: 10px 0; border-radius: 12px; text-align: center; font-size: 13px; color: #7a6a5d; }
+        .calendar-cell.header { font-weight: 700; color: #b67d33; }
+        .calendar-cell.active { background: #ffdc9d; color: #7a4f0f; }
+        .time-panel button { width: 100%; padding: 12px 0; margin-bottom: 10px; border: none; border-radius: 14px; background: #ffffff; color: #5f4b3b; font-size: 14px; cursor: pointer; }
+        .time-panel button.active { background: #ffe5b5; border: 1px solid #f0c17c; }
+        .meal-buttons { display: grid; gap: 12px; margin-top: 18px; padding: 14px 0; }
+        .meal-buttons button { border: none; border-radius: 18px; padding: 12px 0; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .meal-buttons .morning { background: #f2a04f; color: #ffffff; }
+        .meal-buttons .noon { background: #b7b7b7; color: #ffffff; }
+        .meal-buttons .evening { background: #4da349; color: #ffffff; }
+        .actions { display: flex; gap: 12px; margin: 20px 0 0; }
+        .actions button { flex: 1; border: none; border-radius: 16px; padding: 14px 0; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .actions .cancel { background: #ffffff; color: #6b5c4c; box-shadow: 0 8px 16px rgba(173, 136, 86, 0.12); }
+        .actions .done { background: #3e86f5; color: #ffffff; }
+        a { text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#" class="back-button" id="backButton"></a>
+        <div class="header-title">记录</div>
+    </div>
+    <div class="intro">
+        <div class="intro-title">选择日程</div>
+        <div class="intro-text">在记录页直接跳转到日程页面，可以选择日期、时间和用餐类型。</div>
+    </div>
+    <div class="card">
+        <div class="card-title">预约时间</div>
+        <div class="calendar">
+            <div class="calendar-panel">
+                <div class="calendar-row">
+                    <div class="calendar-cell header">Su</div>
+                    <div class="calendar-cell header">Mo</div>
+                    <div class="calendar-cell header">Tu</div>
+                    <div class="calendar-cell header">We</div>
+                    <div class="calendar-cell header">Th</div>
+                    <div class="calendar-cell header">Fr</div>
+                    <div class="calendar-cell header">Sa</div>
+                </div>
+                <div class="calendar-row">
+                    <div class="calendar-cell">30</div>
+                    <div class="calendar-cell">31</div>
+                    <div class="calendar-cell">1</div>
+                    <div class="calendar-cell">2</div>
+                    <div class="calendar-cell">3</div>
+                    <div class="calendar-cell">4</div>
+                    <div class="calendar-cell">5</div>
+                </div>
+                <div class="calendar-row">
+                    <div class="calendar-cell">6</div>
+                    <div class="calendar-cell">7</div>
+                    <div class="calendar-cell">8</div>
+                    <div class="calendar-cell">9</div>
+                    <div class="calendar-cell active">10</div>
+                    <div class="calendar-cell">11</div>
+                    <div class="calendar-cell">12</div>
+                </div>
+                <div class="calendar-row">
+                    <div class="calendar-cell">13</div>
+                    <div class="calendar-cell">14</div>
+                    <div class="calendar-cell">15</div>
+                    <div class="calendar-cell">16</div>
+                    <div class="calendar-cell">17</div>
+                    <div class="calendar-cell">18</div>
+                    <div class="calendar-cell">19</div>
+                </div>
+            </div>
+            <div class="time-panel">
+                <button>9:30 AM</button>
+                <button>10:00 AM</button>
+                <button>10:30 AM</button>
+                <button class="active">11:30 AM</button>
+                <button>12:00 PM</button>
+                <button>12:30 PM</button>
+                <button>1:00 PM</button>
+            </div>
+        </div>
+        <div class="meal-buttons">
+            <button class="morning">早餐</button>
+            <button class="noon">午餐</button>
+            <button class="evening">晚餐</button>
+        </div>
+        <div class="actions">
+            <button class="cancel">取消</button>
+            <button class="done">完成</button>
+        </div>
+    </div>
+    <script src="navigation.js"></script>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        const backButton = document.getElementById('backButton');
+        backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            } else {
+                window.location.href = 'food_app_home.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 按分类选菜</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; min-height: 100vh; color: #2f2f2f; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff4e1; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #333; }
+        .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #333; border-bottom: 2px solid #333; transform: rotate(45deg); }
+        .header-title { font-size: 20px; font-weight: 700; }
+        .intro { padding: 18px 20px; }
+        .intro-title { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+        .intro-desc { font-size: 14px; color: #6b5a48; line-height: 1.7; }
+        .filter-panel { padding: 0 20px; display: flex; flex-direction: column; gap: 14px; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .filter-group strong { min-width: 56px; color: #d86f2f; font-size: 14px; }
+        .filter-chip { display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; border-radius: 999px; background: #ffffff; border: 1px solid #edd4b9; color: #6f5e4d; font-size: 13px; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+        .filter-chip.active { background: #ffe9b1; border-color: #f2b84b; color: #6f4b0a; }
+        .dish-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0 20px 28px; }
+        .dish-card { border-radius: 20px; overflow: hidden; background: #ffffff; box-shadow: 0 6px 18px rgba(204, 146, 91, 0.15); text-decoration: none; color: inherit; }
+        .dish-cover { height: 132px; background: linear-gradient(135deg, #efdcc9 0%, #d9b694 100%); position: relative; }
+        .dish-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.22) 100%); }
+        .dish-info { padding: 14px 14px 18px; }
+        .dish-name { font-size: 15px; font-weight: 700; margin-bottom: 10px; line-height: 1.3; }
+        .dish-meta { display: flex; justify-content: space-between; font-size: 12px; color: #7a6655; }
+        .dish-meta span { display: inline-flex; align-items: center; gap: 6px; }
+        .dish-meta .dot { width: 4px; height: 4px; border-radius: 50%; background: #c9b7a3; }
+        .view-more { padding: 0 20px 28px; }
+        .view-more a { color: #d87e31; text-decoration: none; font-size: 14px; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#" class="back-button" id="backButton"></a>
+        <div class="header-title">分类</div>
+    </div>
+    <div class="intro">
+        <div class="intro-title">按菜系、烹饪方式、口味选菜</div>
+        <div class="intro-desc">根据你的需求快速找到想吃的菜谱，AI会为你匹配更合适的推荐。</div>
+    </div>
+    <div class="filter-panel">
+        <div class="filter-group">
+            <strong>菜系</strong>
+            <div class="filter-chip">川菜</div>
+            <div class="filter-chip">粤菜</div>
+            <div class="filter-chip">湘菜</div>
+            <div class="filter-chip">鲁菜</div>
+            <div class="filter-chip">苏菜</div>
+            <div class="filter-chip">闽菜</div>
+            <div class="filter-chip">浙菜</div>
+            <div class="filter-chip">徽菜</div>
+        </div>
+        <div class="filter-group">
+            <strong>烹饪</strong>
+            <div class="filter-chip">炒</div>
+            <div class="filter-chip">烧</div>
+            <div class="filter-chip">蒸</div>
+            <div class="filter-chip">炸</div>
+            <div class="filter-chip">煮</div>
+            <div class="filter-chip">炖</div>
+            <div class="filter-chip">焖</div>
+            <div class="filter-chip">拌</div>
+        </div>
+        <div class="filter-group">
+            <strong>口味</strong>
+            <div class="filter-chip">酸</div>
+            <div class="filter-chip">甜</div>
+            <div class="filter-chip">苦</div>
+            <div class="filter-chip">辣</div>
+            <div class="filter-chip">咸</div>
+            <div class="filter-chip">鲜</div>
+            <div class="filter-chip">麻</div>
+            <div class="filter-chip">香</div>
+        </div>
+    </div>
+    <div class="dish-grid">
+        <a href="food_app_result.html?query=鱼香肉丝+推荐" class="dish-card">
+            <div class="dish-cover"></div>
+            <div class="dish-info">
+                <div class="dish-name">鱼香肉丝</div>
+                <div class="dish-meta"><span>25分钟</span><span class="dot"></span><span>香辣</span></div>
+            </div>
+        </a>
+        <a href="food_app_result.html?query=蒜香烤三文鱼+推荐" class="dish-card">
+            <div class="dish-cover"></div>
+            <div class="dish-info">
+                <div class="dish-name">蒜香烤三文鱼</div>
+                <div class="dish-meta"><span>30分钟</span><span class="dot"></span><span>鲜美</span></div>
+            </div>
+        </a>
+        <a href="food_app_result.html?query=番茄鸡蛋炒饭+推荐" class="dish-card">
+            <div class="dish-cover"></div>
+            <div class="dish-info">
+                <div class="dish-name">番茄鸡蛋炒饭</div>
+                <div class="dish-meta"><span>20分钟</span><span class="dot"></span><span>家常</span></div>
+            </div>
+        </a>
+        <a href="food_app_result.html?query=奶油培根意面+推荐" class="dish-card">
+            <div class="dish-cover"></div>
+            <div class="dish-info">
+                <div class="dish-name">奶油培根意面</div>
+                <div class="dish-meta"><span>35分钟</span><span class="dot"></span><span>浓郁</span></div>
+            </div>
+        </a>
+    </div>
+    <div class="view-more">
+        <a href="food_app_result.html?query=根据当前分类为我推荐菜谱">查看更多AI推荐</a>
+    </div>
+    <script src="navigation.js"></script>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('active');
+            });
+        });
+        
+        const backButton = document.getElementById('backButton');
+        backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            }
+        });
+        
+        // 为食谱卡片链接添加导航栈处理
+        const dishLinks = document.querySelectorAll('.dish-card');
+        dishLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetUrl = link.getAttribute('href');
+                if (window.navigationStack) {
+                    window.navigationStack.push(window.location.href);
+                }
+                window.location.href = targetUrl;
+            });
+        });
+        
+        // 为查看更多链接添加导航栈处理
+        const viewMoreLink = document.querySelector('.view-more a');
+        if (viewMoreLink) {
+            viewMoreLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetUrl = viewMoreLink.getAttribute('href');
+                if (window.navigationStack) {
+                    window.navigationStack.push(window.location.href);
+                }
+                window.location.href = targetUrl;
+            });
+        }
+    </script>
+</body>
+</html>

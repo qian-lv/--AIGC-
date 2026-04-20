@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 收藏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Helvetica Neue", Arial, sans-serif; background: #f0f0f0; color: #3b3b3b; min-height: 100vh; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; align-items: center; gap: 12px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
+        .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff4e4; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #3b3b3b; }
+        .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #3b3b3b; border-bottom: 2px solid #3b3b3b; transform: rotate(45deg); }
+        .title { font-size: 20px; font-weight: 700; }
+        .intro { padding: 20px; }
+        .intro .subtitle { font-size: 14px; color: #d87e32; font-weight: 700; margin-bottom: 10px; }
+        .intro .text { font-size: 14px; color: #6a5c4b; line-height: 1.7; }
+        .favorites-grid { display: grid; gap: 14px; padding: 0 20px 28px; }
+        .favorite-card { display: block; background: #ffffff; border-radius: 24px; padding: 18px; box-shadow: 0 10px 24px rgba(212, 160, 104, 0.14); text-decoration: none; color: inherit; }
+        .favorite-card .card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .favorite-card .name { font-size: 16px; font-weight: 700; }
+        .favorite-card .tag { font-size: 12px; color: #b6702d; background: #fff2d7; border-radius: 999px; padding: 6px 10px; }
+        .favorite-card .desc { margin-top: 10px; font-size: 13px; color: #7f6f5c; line-height: 1.7; }
+        .favorite-card .meta { margin-top: 12px; display: flex; gap: 10px; font-size: 12px; color: #8c7a68; }
+        .empty-state { margin: 0 20px 28px; padding: 22px; background: #fff4e6; border-radius: 22px; color: #705936; box-shadow: 0 8px 20px rgba(221, 171, 108, 0.12); }
+        .empty-state .button { display: inline-flex; margin-top: 14px; padding: 10px 16px; border-radius: 999px; background: #ffe1b3; color: #bb6d1e; text-decoration: none; font-size: 13px; font-weight: 700; }
+        .footer { padding: 0 20px 30px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#" class="back-button" id="backButton"></a>
+        <div class="title">收藏</div>
+    </div>
+    <div class="intro">
+        <div class="subtitle">你的收藏夹</div>
+        <div class="text">这里显示你已经收藏的菜谱和推荐，方便快速查看与再次访问。</div>
+    </div>
+    <div class="favorites-grid" id="favoritesGrid"></div>
+    <div class="empty-state" id="emptyState" style="display: none;">
+        <div>你还没有收藏内容。</div>
+        <a href="food_app_more.html" class="button">去更多页面继续收藏</a>
+    </div>
+    <div class="footer"></div>
+    <script src="navigation.js"></script>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        const favoriteMap = {
+            plan1: { name: '经典红烧肉', tag: '家常', desc: '慢火炖煮，肥而不腻，是最受欢迎的家庭宴客菜。', query: '经典红烧肉菜谱', meta: ['45分钟', '中式', '浓郁'] },
+            plan2: { name: '香煎鸡胸沙拉', tag: '轻食', desc: '低脂高蛋白的轻盈餐，适合想保持身材的你。', query: '香煎鸡胸沙拉', meta: ['25分钟', '健康', '清爽'] },
+            plan3: { name: '奶油培根意面', tag: '浓郁', desc: '奶油培根与香滑意面，满足欲望的小确幸。', query: '奶油培根意面', meta: ['35分钟', '西式', '浓郁'] },
+            'italian-pasta': { name: '意大利面', tag: '西式', desc: '经典意面搭配新鲜番茄酱，适合轻松家庭晚餐。', query: 'Italian Pasta', meta: ['30分钟', '西式', '番茄'] },
+            'chicken-salad': { name: '鸡肉沙拉', tag: '健康', desc: '搭配鲜蔬和鸡肉的清爽沙拉，适合夏日轻食。', query: 'Chicken Salad', meta: ['20分钟', '低脂', '清爽'] },
+            'beef-steak': { name: '牛排', tag: '豪华', desc: '厚切牛排配香草黄油，适合特别的庆祝时刻。', query: 'Beef Steak', meta: ['40分钟', '高蛋白', '浓郁'] },
+            'fish-curry': { name: '鱼香咖喱', tag: '鲜香', desc: '香浓咖喱搭配嫩鱼块，带来异域风味享受。', query: 'Fish Curry', meta: ['35分钟', '东南亚', '香辣'] }
+        };
+
+        const favoritesGrid = document.getElementById('favoritesGrid');
+        const emptyState = document.getElementById('emptyState');
+        const backButton = document.getElementById('backButton');
+
+        // 返回按钮点击事件
+        backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            } else {
+                window.location.href = 'food_app_home.html';
+            }
+        });
+
+        const favorites = Object.keys(localStorage)
+            .filter(key => key.startsWith('favorite_') && localStorage.getItem(key) === 'true')
+            .map(key => key.replace('favorite_', ''))
+            .filter(id => favoriteMap[id]);
+
+        if (favorites.length === 0) {
+            emptyState.style.display = 'block';
+            // 为空状态的链接添加导航栈处理
+            const emptyStateLink = emptyState.querySelector('a');
+            if (emptyStateLink) {
+                emptyStateLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetUrl = emptyStateLink.getAttribute('href');
+                    if (window.navigationStack) {
+                        window.navigationStack.push(window.location.href);
+                    }
+                    window.location.href = targetUrl;
+                });
+            }
+        } else {
+            emptyState.style.display = 'none';
+            favorites.forEach(id => {
+                const item = favoriteMap[id];
+                const card = document.createElement('a');
+                card.href = `food_app_result.html?query=${encodeURIComponent(item.query)}`;
+                card.className = 'favorite-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="name">${item.name}</div>
+                        <div class="tag">${item.tag}</div>
+                    </div>
+                    <div class="desc">${item.desc}</div>
+                    <div class="meta">${item.meta.map(m => `<span>${m}</span>`).join('')}</div>
+                `;
+                // 为收藏卡片链接添加导航栈处理
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetUrl = card.getAttribute('href');
+                    if (window.navigationStack) {
+                        window.navigationStack.push(window.location.href);
+                    }
+                    window.location.href = targetUrl;
+                });
+                favoritesGrid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

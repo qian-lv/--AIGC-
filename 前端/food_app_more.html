@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 更多</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Helvetica Neue", Arial, sans-serif; background: #f0f0f0; color: #3c3c3c; min-height: 100vh; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 14px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 2; }
+        .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff2db; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #3c3c3c; }
+        .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #3c3c3c; border-bottom: 2px solid #3c3c3c; transform: rotate(45deg); }
+        .header-title { font-size: 20px; font-weight: 700; }
+        .intro { padding: 20px; }
+        .intro-title { font-size: 24px; font-weight: 700; color: #d8772d; margin-bottom: 8px; }
+        .intro-desc { font-size: 14px; color: #6d5c4b; line-height: 1.7; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 0 20px 28px; }
+        .card { background: #ffffff; border-radius: 24px; padding: 18px 18px 20px; box-shadow: 0 12px 24px rgba(220, 171, 102, 0.14); text-decoration: none; color: inherit; display: block; }
+        .card .title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .card .meta { font-size: 13px; color: #7e6a57; line-height: 1.7; }
+        .card .badge { display: inline-flex; align-items: center; justify-content: center; margin-top: 12px; padding: 8px 12px; border-radius: 999px; background: #fff2d4; color: #b66c23; font-size: 12px; font-weight: 700; }
+        .highlight { background: linear-gradient(135deg, #ffe9c8 0%, #ffd7a4 100%); }
+        .footer { padding: 0 20px 30px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#" class="back-button" id="backButton"></a>
+        <div class="header-title">更多</div>
+    </div>
+    <div class="intro">
+        <div class="intro-title">更多功能，点击查看</div>
+        <div class="intro-desc">下面展示的是你可以进一步进入的功能模块，采用圆角卡片风格，界面简洁易点。</div>
+    </div>
+    <div class="grid">
+        <a href="food_app_category.html" class="card highlight" data-nav="true">
+            <div class="title">按分类选菜</div>
+            <div class="meta">按菜系、烹饪方式和口味筛选，快速定位你今天想吃的菜谱。</div>
+            <div class="badge">快速进入</div>
+        </a>
+        <a href="food_app_settings.html" class="card" data-nav="true">
+            <div class="title">设置中心</div>
+            <div class="meta">管理个性化偏好、饮食习惯和应用配置，让推荐更懂你。</div>
+            <div class="badge">调整偏好</div>
+        </a>
+        <a href="food_app_result.html?query=为我推荐今天的菜谱" class="card" data-nav="true">
+            <div class="title">智能推荐</div>
+            <div class="meta">直接进入 AI 推荐页面，让系统根据你的状态给出当日优先菜谱。</div>
+            <div class="badge">立即查看</div>
+        </a>
+        <a href="food_app_schedule.html" class="card" data-nav="true">
+            <div class="title">饮食日程</div>
+            <div class="meta">设置你的每日饮食计划和提醒，保持均衡健康的饮食节奏。</div>
+            <div class="badge">立即查看</div>
+        </a>
+    </div>
+    <div class="footer"></div>
+    <script src="navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 确保导航栈是一个有效的实例
+            if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+                window.navigationStack = {
+                    stack: [],
+                    push: function(url) {
+                        if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                            console.log('页面已在栈顶，无需重复压入:', url);
+                            return;
+                        }
+                        if (this.stack.length >= 10) {
+                            this.stack.shift();
+                        }
+                        this.stack.push(url);
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('压入页面:', url, '当前栈:', this.stack);
+                    },
+                    pop: function() {
+                        if (this.stack.length > 1) {
+                            this.stack.pop();
+                            const previousUrl = this.stack[this.stack.length - 1];
+                            localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                            console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                            return previousUrl;
+                        }
+                        console.log('栈为空或只有一个页面，无法返回');
+                        return null;
+                    },
+                    getStack: function() {
+                        return this.stack;
+                    }
+                };
+            }
+            
+            // 确保当前页面在导航栈中
+            const currentUrl = window.location.href;
+            if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+                window.navigationStack.push(currentUrl);
+            }
+            
+            const navLinks = document.querySelectorAll('a[data-nav="true"]');
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetUrl = link.getAttribute('href');
+                    if (window.navigationStack) {
+                        window.navigationStack.push(window.location.href);
+                    }
+                    window.location.href = targetUrl;
+                });
+            });
+            
+            const backButton = document.getElementById('backButton');
+            backButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (window.navigationStack) {
+                    const previousUrl = window.navigationStack.pop();
+                    if (previousUrl) {
+                        window.location.href = previousUrl;
+                    } else {
+                        // 如果栈为空，默认返回首页
+                        window.location.href = 'food_app_home.html';
+                    }
+                } else {
+                    // 如果导航栈不存在，默认返回首页
+                    window.location.href = 'food_app_home.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

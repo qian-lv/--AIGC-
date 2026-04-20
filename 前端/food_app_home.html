@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            height: 100vh;
+            max-width: 414px; /* 模拟iPhone 11 Pro Max的宽度 */
+            max-height: 896px; /* 模拟iPhone 11 Pro Max的高度 */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .user-info {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .user-info .text {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .user-info .hello {
+            color: #f2c94c;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .user-info .question {
+            color: #888888;
+            font-size: 16px;
+        }
+        .user-info .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: 2px solid #f2c94c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .user-info .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 0 20px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .search-bar .input {
+            width: 100%;
+            height: 50px;
+            background-color: #f5f5f5;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 15px;
+        }
+        .search-bar .icon {
+            width: 24px;
+            height: 24px;
+            fill: #888888;
+            flex-shrink: 0;
+        }
+        .search-bar .camera-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .search-bar .camera-link:hover,
+        .search-bar .voice-button:hover {
+            opacity: 0.7;
+        }
+        .search-bar .voice-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+        .search-bar .text {
+            color: #888888;
+            font-size: 16px;
+            flex-grow: 1;
+        }
+        .search-bar input.text {
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 100px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .section-header .title {
+            color: #000000;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .section-header .view-all {
+            color: #f2c94c;
+            font-size: 14px;
+        }
+        .plan-cards {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .plan-cards::-webkit-scrollbar {
+            display: none;
+        }
+        .plan-card {
+            flex-shrink: 0;
+            width: 160px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .plan-card .image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #f8b195 0%, #f67280 50%, #c06c84 100%);
+            border-radius: 12px 12px 0 0;
+            position: relative;
+        }
+        .plan-card .heart {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            fill: #ffffff;
+            opacity: 0.8;
+            cursor: pointer;
+            transition: fill 0.2s ease;
+        }
+        .plan-card .info {
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .plan-card .minutes {
+            color: #888888;
+            font-size: 12px;
+        }
+        .plan-card .healthy {
+            color: #888888;
+            font-size: 12px;
+        }
+        .recommend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .recommend-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .recommend-card .image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%);
+            border-radius: 12px 12px 0 0;
+            position: relative;
+        }
+        .recommend-card .heart {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            fill: #ff6b6b;
+            cursor: pointer;
+            transition: fill 0.2s ease;
+        }
+        .recommend-card .name {
+            padding: 12px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            margin: -8px 8px 8px 8px;
+            color: #000000;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .more-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .more-card {
+            background-color: #fff7f0;
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(242, 177, 108, 0.18);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 120px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .more-card .more-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #d87f2a;
+            margin-bottom: 8px;
+        }
+        .more-card .more-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .more-preview {
+            display: flex;
+            gap: 14px;
+            padding: 10px 0 20px;
+        }
+        .more-preview .more-card {
+            flex: 1;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .more-preview .more-card .more-title {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .more-preview .more-card .more-desc {
+            font-size: 13px;
+            color: #7a6758;
+            line-height: 1.6;
+        }
+        .bottom-nav {
+            position: relative;
+            width: 100%;
+            height: 80px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            margin-top: auto;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            text-decoration: none;
+            color: inherit;
+        }
+        .nav-item .icon {
+            width: 24px;
+            height: 24px;
+            fill: #ff6b6b;
+        }
+        .nav-item .text {
+            text-decoration: none;
+        }
+        .bottom-nav .nav-item.active .icon {
+            fill: #ff6b6b;
+        }
+        .bottom-nav .nav-item.active .text {
+            color: #ff6b6b;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .modal-content .icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            fill: #f2c94c;
+        }
+        .modal-content .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .modal-content .message {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .modal-content .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .modal-content .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .modal-content .btn.primary {
+            background-color: #f2c94c;
+            color: #fff;
+        }
+        .modal-content .btn.secondary {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="user-info">
+        <div class="text">
+            <div class="hello">Hello, Amir-Zhen</div>
+            <div class="question">What you want to cook today?</div>
+        </div>
+        <div class="avatar">
+            <svg viewBox="0 0 60 60" fill="#f2c94c">
+                <circle cx="30" cy="30" r="30"/>
+                <circle cx="30" cy="24" r="12" fill="#ffffff"/>
+                <path d="M30 40c-8 0-15 5-15 12v2h30v-2c0-7-7-12-15-12z" fill="#ffffff"/>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="search-bar">
+        <div class="input">
+            <a href="food_app_camera.html" class="camera-link">
+                <svg class="icon" viewBox="0 0 32 32" width="24" height="24">
+                    <rect x="4" y="10" width="24" height="16" rx="1.92" fill="none" stroke="#888888" stroke-width="1.5"/>
+                    <polygon points="8,10 24,10 22,6.8 10,6.8" fill="none" stroke="#888888" stroke-width="1.5"/>
+                    <circle cx="16" cy="18" r="4.8" fill="none" stroke="#888888" stroke-width="1.5"/>
+                    <circle cx="19" cy="20" r="1" fill="#888888"/>
+                </svg>
+            </a>
+            <button type="button" class="voice-button" id="voiceButton" aria-label="语音输入">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
+            </button>
+            <input type="text" placeholder="Search by recipes" class="text" id="searchInput">
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="section">
+            <div class="section-header">
+                <div class="title">计划</div>
+                <div class="view-all">View All</div>
+            </div>
+            <div class="plan-cards">
+                <div class="plan-card" data-id="plan1">
+                    <div class="image">
+                        <svg class="heart" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="info">
+                        <div class="minutes">20 Minutes</div>
+                        <div class="healthy">healthy</div>
+                    </div>
+                </div>
+                <div class="plan-card" data-id="plan2">
+                    <div class="image" style="background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%);">
+                        <svg class="heart" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="info">
+                        <div class="minutes">25 Minutes</div>
+                        <div class="healthy">healthy</div>
+                    </div>
+                </div>
+                <div class="plan-card" data-id="plan3">
+                    <div class="image" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                        <svg class="heart" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="info">
+                        <div class="minutes">30 Minutes</div>
+                        <div class="healthy">healthy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <div class="title">推荐</div>
+                <div class="view-all">View All</div>
+            </div>
+            <div class="recommend-grid">
+                <div class="recommend-card" data-id="italian-pasta">
+                    <div class="image">
+                        <svg class="heart" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="name">Italian Pasta</div>
+                </div>
+                <div class="recommend-card" data-id="chicken-salad">
+                    <div class="image" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">
+                        <svg class="heart" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="name">Chicken Salad</div>
+                </div>
+                <div class="recommend-card" data-id="beef-steak">
+                    <div class="image" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                        <svg class="heart" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="name">Beef Steak</div>
+                </div>
+                <div class="recommend-card" data-id="fish-curry">
+                    <div class="image" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                        <svg class="heart" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <div class="name">Fish Curry</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <div class="title">更多</div>
+                <div class="view-all"><a href="food_app_more.html" style="color: #f2c94c; text-decoration: none;">点击进入</a></div>
+            </div>
+            <div class="more-preview">
+                <a href="food_app_more.html" class="more-card">
+                    <div class="more-title">更多功能</div>
+                    <div class="more-desc">进入更多页面查看按分类选菜、设置中心等所有模块。</div>
+                </a>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <div class="title">个人</div>
+                <div class="view-all">View All</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-nav">
+        <a href="food_app_favorites.html" class="nav-item" onclick="navigateTo(this.getAttribute('href'))">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <div class="text">收藏</div>
+        </a>
+        <a href="food_app_schedule.html" class="nav-item" onclick="navigateTo(this.getAttribute('href'))">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+            </svg>
+            <div class="text">记录</div>
+        </a>
+        <a href="food_app_more.html" class="nav-item" onclick="navigateTo(this.getAttribute('href'))">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm6 0h5v-6h-5v6zm6 0h5v-6h-5v6zm-6-7h5V5h-5v6zm6-6v6h5V5h-5z"/>
+            </svg>
+            <div class="text">更多</div>
+        </a>
+    </div>
+    
+    <!-- 权限请求弹窗 -->
+    <div id="permissionModal" class="modal">
+        <div class="modal-content">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <div class="title" id="modalTitle">权限请求</div>
+            <div class="message" id="modalMessage">需要您的许可来访问此功能。</div>
+            <div class="buttons">
+                <button class="btn secondary" onclick="closeModal()">取消</button>
+                <button class="btn primary" id="confirmBtn" onclick="confirmPermission()">允许</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="navigation.js"></script>
+    <script>
+        // 导航函数，用于处理底部导航栏跳转
+        function navigateTo(url) {
+            // 确保导航栈存在
+            if (window.navigationStack) {
+                // 压入当前页面到导航栈
+                window.navigationStack.push(window.location.href);
+            }
+            // 跳转到目标页面
+            window.location.href = url;
+        }
+
+        let currentAction = null;
+        let searchInput, voiceButton, cameraLink;
+        
+        // 显示弹窗
+        function showModal(title, message, action) {
+            // 将当前页面压入导航栈
+            if (window.navigationStack) {
+                window.navigationStack.push(window.location.href);
+            }
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            currentAction = action;
+            document.getElementById('permissionModal').style.display = 'flex';
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('permissionModal').style.display = 'none';
+            // 从导航栈中弹出
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                }
+            }
+            currentAction = null;
+        }
+
+        // 确认权限
+        function confirmPermission() {
+            if (currentAction === 'voice') {
+                startVoiceAccess();
+            } else if (currentAction === 'camera') {
+                // 无论摄像头是否正常打开，都跳转到相机页面
+                if (window.navigationStack) {
+                    window.navigationStack.push(window.location.href);
+                }
+                window.location.href = 'food_app_camera.html';
+            }
+            document.getElementById('permissionModal').style.display = 'none';
+            currentAction = null;
+        }
+
+        // 麦克风权限请求并启动语音识别
+        async function startVoiceAccess() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                } catch (error) {
+                    console.error('麦克风权限失败：', error);
+                    alert('无法访问麦克风，请检查权限设置或使用支持的浏览器。');
+                    return;
+                }
+            }
+            startVoiceRecognition();
+        }
+
+        // 摄像头权限请求并跳转
+        async function startCameraAccess() {
+            // 此函数现在不再被直接调用，而是通过confirmPermission函数直接跳转
+        }
+
+        // 语音识别
+        function startVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('您的浏览器不支持语音识别功能。');
+                return;
+            }
+
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'zh-CN'; // 设置为中文
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function() {
+                searchInput.placeholder = '正在聆听...';
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                searchInput.value = transcript;
+                searchInput.placeholder = 'Search by recipes';
+            };
+
+            recognition.onerror = function(event) {
+                console.error('语音识别错误:', event.error);
+                searchInput.placeholder = 'Search by recipes';
+                alert('语音识别失败，请重试。');
+            };
+
+            recognition.onend = function() {
+                searchInput.placeholder = 'Search by recipes';
+            };
+
+            recognition.start();
+        }
+
+        // 确保DOM加载完成后再执行代码
+        document.addEventListener('DOMContentLoaded', function() {
+            // 确保导航栈是一个有效的实例
+            if (!window.navigationStack || typeof window.navigationStack.clear !== 'function') {
+                // 如果导航栈不存在或不是有效的实例，创建一个新的
+                window.navigationStack = {
+                    stack: [],
+                    clear: function() {
+                        this.stack = [];
+                        localStorage.removeItem('navigationStack');
+                        console.log('导航栈已清空');
+                    },
+                    push: function(url) {
+                        if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                            console.log('页面已在栈顶，无需重复压入:', url);
+                            return;
+                        }
+                        if (this.stack.length >= 10) {
+                            this.stack.shift();
+                        }
+                        this.stack.push(url);
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('压入页面:', url, '当前栈:', this.stack);
+                    },
+                    pop: function() {
+                        if (this.stack.length > 1) {
+                            this.stack.pop();
+                            const previousUrl = this.stack[this.stack.length - 1];
+                            localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                            console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                            return previousUrl;
+                        }
+                        console.log('栈为空或只有一个页面，无法返回');
+                        return null;
+                    },
+                    getStack: function() {
+                        return this.stack;
+                    }
+                };
+            }
+            // 首页加载时清空导航栈，确保从首页开始的导航是正确的
+            window.navigationStack.clear();
+            // 压入首页作为栈的第一个元素
+            window.navigationStack.push(window.location.href);
+            
+            searchInput = document.getElementById('searchInput');
+            voiceButton = document.getElementById('voiceButton');
+            cameraLink = document.querySelector('.camera-link');
+
+            // 语音图标点击事件
+            voiceButton.addEventListener('click', () => {
+                showModal('语音权限请求', '需要访问您的麦克风来进行语音识别，将您的语音转换为文字。', 'voice');
+            });
+
+            // 相机链接点击事件
+            cameraLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('相机权限请求', '需要访问您的摄像头来进行拍照识别食材。', 'camera');
+            });
+
+            // 卡片点击跳转到详情页
+            document.querySelectorAll('.plan-card, .recommend-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    console.log('点击事件触发');
+                    console.log('点击的元素:', e.target);
+                    console.log('当前卡片:', card);
+                    
+                    // 确保导航栈存在
+                    console.log('导航栈是否存在:', window.navigationStack ? '是' : '否');
+                    if (window.navigationStack) {
+                        console.log('当前栈状态:', window.navigationStack.getStack());
+                        // 压入当前页面到导航栈
+                        window.navigationStack.push(window.location.href);
+                        console.log('压入后栈状态:', window.navigationStack.getStack());
+                    }
+                    
+                    // 跳转到详情页
+                    console.log('准备跳转到详情页');
+                    window.location.href = 'food_app_detail.html';
+                    console.log('跳转命令已执行');
+                });
+            });
+
+            // 收藏功能：点击心形图标切换状态
+            document.querySelectorAll('.plan-card .heart, .recommend-card .heart').forEach(heart => {
+                heart.addEventListener('click', (e) => {
+                    e.stopPropagation(); // 防止触发卡片点击
+                    const card = heart.closest('.plan-card, .recommend-card');
+                    const cardId = card.dataset.id;
+                    const isFavorited = heart.classList.contains('favorited');
+                    
+                    if (isFavorited) {
+                        heart.classList.remove('favorited');
+                        heart.style.fill = '#ffffff'; // 空心
+                    } else {
+                        heart.classList.add('favorited');
+                        heart.style.fill = '#ff6b6b'; // 填充
+                    }
+                    
+                    // 保存到localStorage
+                    localStorage.setItem(`favorite_${cardId}`, !isFavorited);
+                });
+            });
+
+            // 加载收藏状态
+            document.querySelectorAll('.plan-card, .recommend-card').forEach(card => {
+                const cardId = card.dataset.id;
+                const isFavorited = localStorage.getItem(`favorite_${cardId}`) === 'true';
+                const heart = card.querySelector('.heart');
+                
+                if (isFavorited) {
+                    heart.classList.add('favorited');
+                    heart.style.fill = '#ff6b6b';
+                }
+            });
+
+            // 底部导航高亮（假设当前是首页）
+            document.querySelector('.bottom-nav .nav-item:first-child').classList.add('active');
+
+            // 搜索框Enter键跳转到结果页
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        // 确保导航栈存在
+                        if (window.navigationStack) {
+                            // 压入当前页面到导航栈
+                            window.navigationStack.push(window.location.href);
+                        }
+                        // 跳转到结果页
+                        window.location.href = `food_app_result.html?query=${encodeURIComponent(query)}`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

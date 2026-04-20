@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 拍摄页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            width: 414px;
+            height: 896px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .top-bar {
+            width: 100%;
+            height: 60px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            flex-shrink: 0;
+            padding: 0 16px;
+        }
+        .top-bar .right-icons {
+            display: flex;
+            gap: 30px;
+            margin-right: 16px;
+        }
+        .back-button {
+            position: absolute;
+            left: 16px;
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+        }
+        .back-button::after {
+            content: '';
+            width: 25px;
+            height: 18px;
+            background-color: #f2c94c;
+            clip-path: polygon(100% 40%, 40% 40%, 40% 0%, 0% 50%, 40% 100%, 40% 60%, 100% 60%);
+        }
+        .back-button:hover {
+            opacity: 0.8;
+        }
+        .dynamic-island {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+        }
+        .top-bar .icon {
+            width: 28px;
+            height: 28px;
+            fill: #f2c94c;
+        }
+        .icon-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(242,201,76,0.3);
+            cursor: pointer;
+        }
+        .icon-button:hover {
+            opacity: 0.85;
+        }
+        .icon-button.active {
+            background: #f2c94c;
+            color: #fff;
+        }
+        .main-preview {
+            flex: 1;
+            background-color: #0f174f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            background-color: #0f174f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-frame video,
+        .preview-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .preview-frame img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        .preview-frame-message {
+            position: absolute;
+            z-index: 2;
+            color: #ffffff;
+            font-size: 16px;
+            text-align: center;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 16px;
+            max-width: 80%;
+        }
+        .gallery-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.95);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .gallery-icon:hover {
+            opacity: 0.85;
+        }
+        .bottom-bar {
+            width: 100%;
+            height: 80px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .bottom-bar .icon {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: #f2c94c;
+            stroke-width: 2;
+        }
+        .bottom-bar .capture-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #f2c94c;
+            border-radius: 50%;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .bottom-bar .capture-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .bottom-bar .capture-link:hover {
+            opacity: 0.7;
+        }
+        .bottom-bar .capture-btn-inner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: none;
+        }
+        .bottom-bar .steak-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid #f2c94c;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .bottom-bar .steak-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: none;
+            stroke: #f2c94c;
+            stroke-width: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="#" class="back-button" id="backButton"></a>
+        <div class="dynamic-island"></div>
+        <div class="right-icons">
+            <button class="icon-button" id="flashToggle" type="button" aria-label="闪光灯">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+                </svg>
+            </button>
+            <button class="icon-button" id="switchCameraButton" type="button" aria-label="切换摄像头">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z"/>
+                </svg>
+            </button>
+            <button class="icon-button" type="button" aria-label="说明">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div class="main-preview">
+        <div class="preview-frame">
+            <video id="videoPreview" autoplay muted playsinline></video>
+            <img id="imagePreview" class="preview-image" alt="选中的图片" style="display:none;" />
+            <div id="cameraMessage" class="preview-frame-message">正在请求摄像头...</div>
+        </div>
+    </div>
+    
+    <input type="file" id="galleryInput" accept="image/*" style="display:none;" />
+
+    <div class="bottom-bar">
+        <button id="galleryButton" class="gallery-icon" type="button" aria-label="图库">
+            <svg viewBox="0 0 32 32" width="28" height="28">
+                <rect x="4" y="6" width="24" height="20" rx="3" fill="none" stroke="#f2c94c" stroke-width="2"/>
+                <circle cx="12" cy="14" r="3" fill="none" stroke="#f2c94c" stroke-width="2"/>
+                <path d="M8 24l5-7 4 5 5-7 5 9" fill="none" stroke="#f2c94c" stroke-width="2"/>
+            </svg>
+        </button>
+        <button id="captureButton" class="capture-btn" type="button" aria-label="拍照">
+            <div class="capture-btn-inner"></div>
+        </button>
+        <div class="steak-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+        </div>
+    </div>
+    <script src="navigation.js"></script>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        const videoPreview = document.getElementById('videoPreview');
+        const imagePreview = document.getElementById('imagePreview');
+        const cameraMessage = document.getElementById('cameraMessage');
+        const captureButton = document.getElementById('captureButton');
+        const galleryInput = document.getElementById('galleryInput');
+        const galleryButton = document.getElementById('galleryButton');
+        const flashToggle = document.getElementById('flashToggle');
+        const switchCameraButton = document.getElementById('switchCameraButton');
+        const backButton = document.getElementById('backButton');
+        let cameraStream = null;
+
+        async function openCamera() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                cameraMessage.textContent = '当前浏览器不支持摄像头功能。';
+                return;
+            }
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                videoPreview.srcObject = cameraStream;
+                cameraMessage.style.display = 'none';
+            } catch (error) {
+                console.error('打开摄像头失败：', error);
+                cameraMessage.textContent = '无法打开摄像头，请检查权限设置。';
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+        }
+
+        captureButton.addEventListener('click', () => {
+            if (!cameraStream) {
+                alert('当前未连接摄像头，请允许访问摄像头后重试。');
+                return;
+            }
+            if (window.navigationStack) {
+                window.navigationStack.push(window.location.href);
+            }
+            window.location.href = 'food_app_result.html';
+        });
+        
+        // 返回按钮点击事件
+        backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            } else {
+                window.location.href = 'food_app_home.html';
+            }
+        });
+
+        galleryInput.addEventListener('change', (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+            imagePreview.src = url;
+            imagePreview.style.display = 'block';
+            videoPreview.style.display = 'none';
+            cameraMessage.textContent = '已选择图片，可继续拍照或重选。';
+            cameraMessage.style.display = 'block';
+        });
+
+        galleryButton.addEventListener('click', () => {
+            galleryInput.click();
+        });
+
+        flashToggle.addEventListener('click', async () => {
+            if (!cameraStream) {
+                alert('请先授权摄像头。');
+                return;
+            }
+            const track = cameraStream.getVideoTracks()[0];
+            const capabilities = track.getCapabilities();
+            if (!capabilities.torch) {
+                alert('当前设备不支持闪光灯。');
+                return;
+            }
+            const current = track.getSettings().torch === true;
+            try {
+                await track.applyConstraints({ advanced: [{ torch: !current }] });
+                flashToggle.classList.toggle('active', !current);
+            } catch (error) {
+                console.error('闪光灯设置失败：', error);
+                alert('无法切换闪光灯。');
+            }
+        });
+
+        switchCameraButton.addEventListener('click', async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('当前浏览器不支持摄像头切换。');
+                return;
+            }
+            const activeTrack = cameraStream ? cameraStream.getVideoTracks()[0] : null;
+            const currentFacing = activeTrack ? activeTrack.getSettings().facingMode || 'environment' : 'environment';
+            const nextFacing = currentFacing === 'user' ? 'environment' : 'user';
+            stopCamera();
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: nextFacing } });
+                videoPreview.srcObject = cameraStream;
+                imagePreview.style.display = 'none';
+                videoPreview.style.display = 'block';
+                cameraMessage.style.display = 'none';
+                flashToggle.classList.remove('active');
+            } catch (error) {
+                console.error('切换摄像头失败：', error);
+                alert('无法切换摄像头。');
+            }
+        });
+
+        window.addEventListener('load', openCamera);
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+</body>
+</html>

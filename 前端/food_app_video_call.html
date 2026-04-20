@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频通话</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            width: 414px;
+            height: 896px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background-color: #2962FF;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(41, 98, 255, 0.3);
+            transition: transform 0.2s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .back-btn span {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .avatar-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .avatar-halo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background-color: #FFF3CD;
+            animation: breathing 2s ease-in-out infinite;
+        }
+
+        @keyframes breathing {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ringing {
+            margin-top: 30px;
+            color: #9E9E9E;
+            font-size: 18px;
+            font-family: Arial, sans-serif;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            padding-bottom: 80px;
+        }
+
+        .btn {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 36px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.08);
+        }
+
+        .btn-video {
+            background-color: #2962FF;
+        }
+
+        .btn-mic {
+            background-color: #FFFFFF;
+            border: 1px solid #ddd;
+        }
+
+        .btn-hangup {
+            background-color: #FF7043;
+        }
+
+        .btn-hangup a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+    <script src="navigation.js"></script>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" id="backButton">
+            <span>←</span>
+        </button>
+
+        <div class="avatar-section">
+            <div class="avatar-wrap">
+                <div class="avatar-halo"></div>
+                <div class="avatar"></div>
+            </div>
+            <div class="ringing">Ringing...</div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-video">📹</button>
+            <button class="btn btn-mic">🎤</button>
+            <button class="btn btn-hangup" id="hangupBtn">📞</button>
+        </div>
+    </div>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        document.getElementById('hangupBtn').addEventListener('click', function() {
+            if (window.navigationStack) {
+                window.navigationStack.push(window.location.href);
+            }
+            window.location.href = 'game_app_complete.html';
+        });
+        
+        // 返回按钮点击事件
+        document.getElementById('backButton').addEventListener('click', function() {
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            } else {
+                window.location.href = 'food_app_home.html';
+            }
+        });
+    </script>
+</body>
+</html>

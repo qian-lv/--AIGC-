@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 设置</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #f0f0f0; font-family: "Helvetica Neue", Arial, sans-serif; color: #3a3a3a; min-height: 100vh; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
+        .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff4e3; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #3a3a3a; }
+        .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #3a3a3a; border-bottom: 2px solid #3a3a3a; transform: rotate(45deg); }
+        .header-title { font-size: 20px; font-weight: 700; }
+        .hero { padding: 24px 20px; display: flex; flex-direction: column; gap: 12px; }
+        .hero .subtitle { color: #d87e32; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; }
+        .hero .title { font-size: 26px; font-weight: 700; line-height: 1.2; }
+        .hero .description { font-size: 14px; color: #6f5f4f; line-height: 1.7; }
+        .hero-banner { background: linear-gradient(135deg, #fff3df 0%, #f8e0c2 100%); border-radius: 24px; padding: 18px; box-shadow: 0 12px 24px rgba(232, 174, 103, 0.14); }
+        .hero-banner .banner-title { font-size: 15px; color: #c86f2b; font-weight: 700; margin-bottom: 8px; }
+        .hero-banner .banner-text { font-size: 13px; color: #6f5f4f; line-height: 1.7; }
+        .settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0 20px 26px; }
+        .setting-card { background: #ffffff; border-radius: 24px; padding: 18px; box-shadow: 0 10px 24px rgba(211, 166, 112, 0.14); text-decoration: none; color: inherit; display: grid; gap: 10px; }
+        .setting-card .card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .setting-card .label { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #fff2d7; color: #c8762d; font-size: 14px; font-weight: 700; }
+        .setting-card .name { font-size: 15px; font-weight: 700; }
+        .setting-card .meta { font-size: 13px; color: #7f6d58; line-height: 1.7; }
+        .setting-card .action { margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; width: fit-content; padding: 8px 14px; border-radius: 999px; background: #fff2d4; color: #b66c23; font-size: 12px; font-weight: 700; }
+        .shortcut-list { display: grid; gap: 12px; padding: 0 20px 20px; }
+        .shortcut-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 18px; background: #fff4e8; font-size: 14px; color: #5c493b; text-decoration: none; }
+        .shortcut-item span:first-child { font-weight: 600; }
+        .footer { padding: 0 20px 30px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#" class="back-button" id="backButton"></a>
+        <div class="header-title">设置</div>
+    </div>
+    <div class="hero">
+        <div class="subtitle">设置中心</div>
+        <div class="title">你的小助手更懂你的口味</div>
+        <div class="description">这里把设置功能拆成多个圆角卡片，快速进入偏好、收藏、日程、系统调整。</div>
+        <div class="hero-banner">
+            <div class="banner-title">轻松管理</div>
+            <div class="banner-text">通过简单的设置入口，让你把 AI 推荐结果更好地对齐到每天的饮食习惯。</div>
+        </div>
+    </div>
+    <div class="settings-grid">
+        <a href="food_app_result.html?query=个性化低糖饮食推荐" class="setting-card">
+            <div class="card-header">
+                <div class="label">偏</div>
+                <div class="name">喜好与忌口</div>
+            </div>
+            <div class="meta">告诉AI你喜欢的口味与需要避免的食材，推荐结果更精准。</div>
+            <div class="action">立即设置</div>
+        </a>
+        <a href="food_app_result.html?query=推荐适合我的营养计划" class="setting-card">
+            <div class="card-header">
+                <div class="label">藏</div>
+                <div class="name">我的收藏</div>
+            </div>
+            <div class="meta">管理你常用的菜谱和收藏内容，方便下次快速复用。</div>
+            <div class="action">查看收藏</div>
+        </a>
+        <a href="food_app_result.html?query=为我制定一天饮食计划" class="setting-card">
+            <div class="card-header">
+                <div class="label">日</div>
+                <div class="name">饮食日程</div>
+            </div>
+            <div class="meta">设置每日饮食提醒和计划，保持均衡节奏。</div>
+            <div class="action">设置日程</div>
+        </a>
+        <a href="food_app_result.html?query=帮助我调整应用主题和提醒" class="setting-card">
+            <div class="card-header">
+                <div class="label">设</div>
+                <div class="name">更多设置</div>
+            </div>
+            <div class="meta">调整主题、通知、账号和高级推荐选项。</div>
+            <div class="action">进入设置</div>
+        </a>
+    </div>
+    <div class="shortcut-list">
+        <div class="shortcut-item"><span>偏好设置</span><span>&gt;</span></div>
+        <div class="shortcut-item"><span>通知与提醒</span><span>&gt;</span></div>
+        <div class="shortcut-item"><span>清除历史</span><span>&gt;</span></div>
+    </div>
+    <div class="footer"></div>
+    <script src="navigation.js"></script>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        const backButton = document.getElementById('backButton');
+        backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            } else {
+                window.location.href = 'food_app_home.html';
+            }
+        });
+        
+        // 为设置卡片链接添加导航栈处理
+        const settingCards = document.querySelectorAll('.setting-card');
+        settingCards.forEach(function(card) {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetUrl = card.getAttribute('href');
+                if (window.navigationStack) {
+                    window.navigationStack.push(window.location.href);
+                }
+                window.location.href = targetUrl;
+            });
+        });
+    </script>
+</body>
+</html>

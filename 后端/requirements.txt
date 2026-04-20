@@ -1,0 +1,4 @@
+Flask==2.3.3
+flask-cors==6.0.2
+requests==2.31.0
+openai==1.0.0  # 可选，用于OpenAI兼容库

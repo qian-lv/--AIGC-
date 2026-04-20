@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 食谱生成结果页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            width: 414px;
+            height: 896px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .title-section {
+            width: 100%;
+            height: 60px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            padding: 20px;
+            position: relative;
+        }
+        .back-button {
+            position: absolute;
+            left: 16px;
+            width: 40px;
+            height: 40px;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .back-button::after {
+            content: '';
+            width: 16px;
+            height: 12px;
+            background-color: #000000;
+            clip-path: polygon(100% 40%, 40% 40%, 40% 0%, 0% 50%, 40% 100%, 40% 60%, 100% 60%);
+        }
+        .back-button:hover {
+            opacity: 0.8;
+        }
+        .title-section h1 {
+            color: #000000;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .recipe-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-bottom: 20px;
+        }
+        .recipe-card-link {
+            text-decoration: none;
+            display: block;
+        }
+        .recipe-card {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        .recipe-card .image-area {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #f8b195 0%, #f67280 50%, #c06c84 100%);
+            border-radius: 16px 16px 0 0;
+            position: relative;
+        }
+        .recipe-card .category-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .recipe-card .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%);
+            border-radius: 0 0 16px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 16px;
+        }
+        .recipe-card .recipe-name {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .recipe-card .recipe-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .recipe-card .time-info {
+            color: #ffffff;
+            font-size: 14px;
+        }
+        .recipe-card .rating-info {
+            color: #ffffff;
+            font-size: 14px;
+        }
+        .recipe-card .flavor-tag {
+            color: #ffffff;
+            font-size: 12px;
+            background-color: rgba(255,255,255,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+        .ai-panel {
+            width: 100%;
+            padding: 20px;
+            background-color: #fff7e7;
+            border-bottom: 1px solid #f0e3d6;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .ai-panel textarea {
+            width: 100%;
+            min-height: 100px;
+            max-height: 150px;
+            border: 1px solid #e0c9a5;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 14px;
+            resize: vertical;
+            overflow-y: auto;
+        }
+        .ai-panel .ai-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .ai-panel button {
+            border: none;
+            background-color: #f2c94c;
+            color: #000000;
+            border-radius: 999px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .ai-panel button:hover {
+            opacity: 0.9;
+        }
+        .ai-panel .ai-result {
+            width: 100%;
+            min-height: 140px;
+            max-height: 200px;
+            border: 1px solid #e0c9a5;
+            border-radius: 16px;
+            padding: 16px;
+            background-color: #ffffff;
+            color: #333333;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="title-section">
+        <a href="#" class="back-button" id="backButton"></a>
+        <h1>您的专属食谱已生成</h1>
+    </div>
+    
+    <div class="ai-panel">
+        <div>请输入您的饮食目标或偏好，例如“我想减脂，晚餐想吃低卡中餐”。</div>
+        <textarea id="aiQuery" placeholder="例如：我今天想吃低脂、低盐的晚餐，需控制热量在500卡以内。"></textarea>
+        <div class="ai-actions">
+            <button id="generateButton">生成个性化食谱</button>
+            <div id="aiStatus">后端未请求</div>
+        </div>
+        <div class="ai-result" id="aiResult">AI回复会显示在这里。</div>
+    </div>
+    
+    <div class="recipe-list">
+        <a href="food_app_detail.html" class="recipe-card-link">
+            <div class="recipe-card">
+                <div class="image-area">
+                    <div class="category-tag" style="background-color: #f2c94c;">中式</div>
+                    <div class="overlay">
+                        <div class="recipe-name">红烧肉</div>
+                        <div class="recipe-info">
+                            <div class="time-info">制作时长：45分钟</div>
+                            <div class="rating-info">推荐指数：★★★★★</div>
+                        </div>
+                        <div class="flavor-tag">口味：香甜</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="food_app_detail_italian.html" class="recipe-card-link">
+            <div class="recipe-card">
+                <div class="image-area" style="background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%);">
+                    <div class="category-tag" style="background-color: #ff6b6b;">西式</div>
+                    <div class="overlay">
+                        <div class="recipe-name">意大利面</div>
+                        <div class="recipe-info">
+                            <div class="time-info">制作时长：30分钟</div>
+                            <div class="rating-info">推荐指数：★★★★★★</div>
+                        </div>
+                        <div class="flavor-tag">口味：浓郁</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="food_app_detail_sushi.html" class="recipe-card-link">
+            <div class="recipe-card">
+                <div class="image-area" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                    <div class="category-tag" style="background-color: #4ecdc4;">日式</div>
+                    <div class="overlay">
+                        <div class="recipe-name">寿司拼盘</div>
+                        <div class="recipe-info">
+                            <div class="time-info">制作时长：25分钟</div>
+                            <div class="rating-info">推荐指数：★★★★★★</div>
+                        </div>
+                        <div class="flavor-tag">口味：鲜美</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="food_app_detail_korean.html" class="recipe-card-link">
+            <div class="recipe-card">
+                <div class="image-area" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                    <div class="category-tag" style="background-color: #a8e6cf;">韩式</div>
+                    <div class="overlay">
+                        <div class="recipe-name">韩式烤肉</div>
+                        <div class="recipe-info">
+                            <div class="time-info">制作时长：35分钟</div>
+                            <div class="rating-info">推荐指数：★★★★</div>
+                        </div>
+                        <div class="flavor-tag">口味：香辣</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="food_app_detail_dessert.html" class="recipe-card-link">
+            <div class="recipe-card">
+                <div class="image-area" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                    <div class="category-tag" style="background-color: #f2c94c;">甜点</div>
+                    <div class="overlay">
+                        <div class="recipe-name">法式甜点</div>
+                        <div class="recipe-info">
+                            <div class="time-info">制作时长：40分钟</div>
+                            <div class="rating-info">推荐指数：★★★★★★</div>
+                        </div>
+                        <div class="flavor-tag">口味：甜美</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <script src="navigation.js"></script>
+    <script>
+        // 确保导航栈是一个有效的实例
+        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
+            window.navigationStack = {
+                stack: [],
+                push: function(url) {
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
+                        console.log('页面已在栈顶，无需重复压入:', url);
+                        return;
+                    }
+                    if (this.stack.length >= 10) {
+                        this.stack.shift();
+                    }
+                    this.stack.push(url);
+                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                    console.log('压入页面:', url, '当前栈:', this.stack);
+                },
+                pop: function() {
+                    if (this.stack.length > 1) {
+                        this.stack.pop();
+                        const previousUrl = this.stack[this.stack.length - 1];
+                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
+                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
+                        return previousUrl;
+                    }
+                    console.log('栈为空或只有一个页面，无法返回');
+                    return null;
+                },
+                getStack: function() {
+                    return this.stack;
+                }
+            };
+        }
+        
+        // 确保当前页面在导航栈中
+        const currentUrl = window.location.href;
+        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
+            window.navigationStack.push(currentUrl);
+        }
+        
+        const generateButton = document.getElementById('generateButton');
+        const aiQuery = document.getElementById('aiQuery');
+        const aiResult = document.getElementById('aiResult');
+        const aiStatus = document.getElementById('aiStatus');
+        const backButton = document.getElementById('backButton');
+
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name) || '';
+        }
+
+        async function generateRecipe() {
+            const prompt = aiQuery.value.trim();
+            if (!prompt) {
+                alert('请输入您的饮食偏好或目标。');
+                return;
+            }
+
+            aiStatus.textContent = '生成中...';
+            aiResult.textContent = '正在请求后端AI接口，请稍候。';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: prompt })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.reply) {
+                    aiResult.textContent = data.reply;
+                    aiStatus.textContent = '生成成功';
+                } else {
+                    aiResult.textContent = data.error || '生成失败，请重试。';
+                    aiStatus.textContent = '请求失败';
+                }
+            } catch (error) {
+                aiResult.textContent = '网络错误：' + error.message;
+                aiStatus.textContent = '网络异常';
+            }
+        }
+
+        function autoGenerateFromQuery() {
+            const initialQuery = getQueryParam('query');
+            if (initialQuery) {
+                aiQuery.value = initialQuery;
+                generateRecipe();
+            }
+        }
+
+        generateButton.addEventListener('click', generateRecipe);
+        backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.navigationStack) {
+                const previousUrl = window.navigationStack.pop();
+                if (previousUrl) {
+                    window.location.href = previousUrl;
+                } else {
+                    window.location.href = 'food_app_home.html';
+                }
+            }
+        });
+        
+        // 为食谱卡片链接添加导航栈处理
+        const recipeLinks = document.querySelectorAll('.recipe-card-link');
+        recipeLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetUrl = link.getAttribute('href');
+                if (window.navigationStack) {
+                    window.navigationStack.push(window.location.href);
+                }
+                window.location.href = targetUrl;
+            });
+        });
+        
+        autoGenerateFromQuery();
+    </script>
+</body>
+</html>

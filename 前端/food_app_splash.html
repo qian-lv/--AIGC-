@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 欢迎页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('../图片/启动页面.png') center center / cover no-repeat;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.52) 45%, rgba(0,0,0,0.82) 100%);
+            z-index: 0;
+        }
+        .status-bar {
+            position: absolute;
+            top: 18px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            color: #ffffff;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        .status-left,
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.18);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #fff;
+        }
+        .main-visual {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 24px 80px;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .title-line {
+            font-size: 36px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 12px 24px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
+            line-height: 1.1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.92);
+            text-align: center;
+            line-height: 1.6;
+            max-width: 280px;
+            margin: 0 auto;
+            opacity: 0.95;
+        }
+        .bottom-action {
+            width: 100%;
+            padding: 0 20px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .start-button {
+            width: 280px;
+            height: 60px;
+            background-color: #f2c94c;
+            border: none;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(242, 201, 76, 0.4);
+        }
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(242, 201, 76, 0.6);
+        }
+        .start-button:active {
+            transform: translateY(0);
+        }
+        .arrow-icon {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            margin-right: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .arrow-icon::after {
+            content: '';
+            width: 25px;
+            height: 18px;
+            background-color: #f2c94c;
+            clip-path: polygon(0 40%, 60% 40%, 60% 0%, 100% 50%, 60% 100%, 60% 60%, 0 60%);
+            border-radius: 2px;
+        }
+        .button-text {
+            color: #1f1a12;
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .start-button {
+            width: 220px;
+            height: 52px;
+            background-color: rgba(242, 201, 76, 0.92);
+            border: none;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 18px 40px rgba(242, 201, 76, 0.22);
+            backdrop-filter: blur(10px);
+            margin-bottom: 18px;
+        }
+        .start-button:hover {
+            transform: translateY(-2px);
+        }
+        .start-button:active {
+            transform: translateY(0);
+        }
+        .arrow-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .arrow-icon::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border-right: 2px solid #f2c94c;
+            border-bottom: 2px solid #f2c94c;
+            transform: rotate(45deg);
+            display: inline-block;
+        }
+        .bottom-indicator {
+            width: 110px;
+            height: 4px;
+            background-color: rgba(255,255,255,0.75);
+            border-radius: 999px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <div class="status-left">9:41</div>
+        <div class="status-right">
+            <div class="status-icon">5G</div>
+            <div class="status-icon">🔋</div>
+        </div>
+    </div>
+    <div class="main-visual">
+        <div class="title">
+            <div class="title-line">一起开始美</div>
+            <div class="title-line">食之旅吧！</div>
+        </div>
+        <div class="subtitle">Let's make delicious dish with the best recipe for the family</div>
+    </div>
+    <div class="bottom-action">
+        <button class="start-button" onclick="window.location.href='food_app_home.html'">
+            <div class="arrow-icon"></div>
+            <div class="button-text">启程</div>
+        </button>
+        <div class="bottom-indicator"></div>
+    </div>
+</body>
+</html>
