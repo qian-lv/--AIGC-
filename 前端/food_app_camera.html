@@ -10,16 +10,15 @@
             padding: 0;
             box-sizing: border-box;
         }
-        body {
+        html, body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            width: 414px;
-            height: 896px;
+            width: 100%;
+            height: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .top-bar {
             width: 100%;
@@ -154,12 +153,14 @@
         }
         .bottom-bar {
             width: 100%;
-            height: 80px;
+            padding: 10px 20px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
             background-color: #ffffff;
             display: flex;
             justify-content: space-around;
             align-items: center;
             flex-shrink: 0;
+            min-height: 80px;
         }
         .bottom-bar .icon {
             width: 32px;
@@ -214,6 +215,7 @@
             stroke-width: 2;
         }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     <div class="top-bar">
@@ -237,7 +239,7 @@
             </button>
         </div>
     </div>
-    
+
     <div class="main-preview">
         <div class="preview-frame">
             <video id="videoPreview" autoplay muted playsinline></video>
@@ -245,7 +247,7 @@
             <div id="cameraMessage" class="preview-frame-message">正在请求摄像头...</div>
         </div>
     </div>
-    
+
     <input type="file" id="galleryInput" accept="image/*" style="display:none;" />
 
     <div class="bottom-bar">
@@ -267,7 +269,6 @@
     </div>
     <script src="navigation.js"></script>
     <script>
-        // 确保导航栈是一个有效的实例
         if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
             window.navigationStack = {
                 stack: [],
@@ -299,13 +300,12 @@
                 }
             };
         }
-        
-        // 确保当前页面在导航栈中
+
         const currentUrl = window.location.href;
         if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
             window.navigationStack.push(currentUrl);
         }
-        
+
         const videoPreview = document.getElementById('videoPreview');
         const imagePreview = document.getElementById('imagePreview');
         const cameraMessage = document.getElementById('cameraMessage');
@@ -340,18 +340,44 @@
             }
         }
 
-        captureButton.addEventListener('click', () => {
+        captureButton.addEventListener('click', async () => {
             if (!cameraStream) {
                 alert('当前未连接摄像头，请允许访问摄像头后重试。');
                 return;
             }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = videoPreview.videoWidth;
+            canvas.height = videoPreview.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+            localStorage.setItem('captureImage', dataUrl);
+
             if (window.navigationStack) {
                 window.navigationStack.push(window.location.href);
             }
-            window.location.href = 'food_app_result.html';
+            window.location.href = 'food_app_loading.html';
         });
-        
-        // 返回按钮点击事件
+
+        galleryInput.addEventListener('change', (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                localStorage.setItem('captureImage', e.target.result);
+
+                if (window.navigationStack) {
+                    window.navigationStack.push(window.location.href);
+                }
+                window.location.href = 'food_app_loading.html';
+            };
+            reader.readAsDataURL(file);
+        });
+
         backButton.addEventListener('click', function(e) {
             e.preventDefault();
             if (window.navigationStack) {
@@ -359,22 +385,11 @@
                 if (previousUrl) {
                     window.location.href = previousUrl;
                 } else {
-                    window.location.href = 'food_app_home.html';
+                    window.location.href = 'index.html';
                 }
             } else {
-                window.location.href = 'food_app_home.html';
+                window.location.href = 'index.html';
             }
-        });
-
-        galleryInput.addEventListener('change', (event) => {
-            const file = event.target.files && event.target.files[0];
-            if (!file) return;
-            const url = URL.createObjectURL(file);
-            imagePreview.src = url;
-            imagePreview.style.display = 'block';
-            videoPreview.style.display = 'none';
-            cameraMessage.textContent = '已选择图片，可继续拍照或重选。';
-            cameraMessage.style.display = 'block';
         });
 
         galleryButton.addEventListener('click', () => {
@@ -427,5 +442,6 @@
         window.addEventListener('load', openCamera);
         window.addEventListener('beforeunload', stopCamera);
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

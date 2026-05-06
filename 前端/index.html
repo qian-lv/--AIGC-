@@ -14,8 +14,8 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             height: 100vh;
-            max-width: 414px; /* 模拟iPhone 11 Pro Max的宽度 */
-            max-height: 896px; /* 模拟iPhone 11 Pro Max的高度 */
+            max-width: 414px;
+            max-height: 896px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -490,14 +490,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="section" id="generatedSection" style="display:none;">
-            <div class="section-header">
-                <div class="title">AI生成的菜谱</div>
-                <div class="view-all" id="generatedCount">0个</div>
-            </div>
-            <div class="recommend-grid" id="generatedGrid"></div>
-        </div>
         
         <div class="section">
             <div class="section-header">
@@ -541,7 +533,6 @@
         </a>
     </div>
     
-    <!-- 权限请求弹窗 -->
     <div id="permissionModal" class="modal">
         <div class="modal-content">
             <svg class="icon" viewBox="0 0 24 24">
@@ -558,23 +549,17 @@
     
     <script src="navigation.js"></script>
     <script>
-        // 导航函数，用于处理底部导航栏跳转
         function navigateTo(url) {
-            // 确保导航栈存在
             if (window.navigationStack) {
-                // 压入当前页面到导航栈
                 window.navigationStack.push(window.location.href);
             }
-            // 跳转到目标页面
             window.location.href = url;
         }
 
         let currentAction = null;
         let searchInput, voiceButton, cameraLink;
         
-        // 显示弹窗
         function showModal(title, message, action) {
-            // 将当前页面压入导航栈
             if (window.navigationStack) {
                 window.navigationStack.push(window.location.href);
             }
@@ -584,10 +569,8 @@
             document.getElementById('permissionModal').style.display = 'flex';
         }
 
-        // 关闭弹窗
         function closeModal() {
             document.getElementById('permissionModal').style.display = 'none';
-            // 从导航栈中弹出
             if (window.navigationStack) {
                 const previousUrl = window.navigationStack.pop();
                 if (previousUrl) {
@@ -597,12 +580,10 @@
             currentAction = null;
         }
 
-        // 确认权限
         function confirmPermission() {
             if (currentAction === 'voice') {
                 startVoiceAccess();
             } else if (currentAction === 'camera') {
-                // 无论摄像头是否正常打开，都跳转到相机页面
                 if (window.navigationStack) {
                     window.navigationStack.push(window.location.href);
                 }
@@ -612,7 +593,6 @@
             currentAction = null;
         }
 
-        // 麦克风权限请求并启动语音识别
         async function startVoiceAccess() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 try {
@@ -627,12 +607,6 @@
             startVoiceRecognition();
         }
 
-        // 摄像头权限请求并跳转
-        async function startCameraAccess() {
-            // 此函数现在不再被直接调用，而是通过confirmPermission函数直接跳转
-        }
-
-        // 语音识别
         function startVoiceRecognition() {
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
                 alert('您的浏览器不支持语音识别功能。');
@@ -640,7 +614,7 @@
             }
 
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'zh-CN'; // 设置为中文
+            recognition.lang = 'zh-CN';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
@@ -667,11 +641,8 @@
             recognition.start();
         }
 
-        // 确保DOM加载完成后再执行代码
         document.addEventListener('DOMContentLoaded', function() {
-            // 确保导航栈是一个有效的实例
             if (!window.navigationStack || typeof window.navigationStack.clear !== 'function') {
-                // 如果导航栈不存在或不是有效的实例，创建一个新的
                 window.navigationStack = {
                     stack: [],
                     clear: function() {
@@ -707,74 +678,60 @@
                     }
                 };
             }
-            // 首页加载时清空导航栈，确保从首页开始的导航是正确的
             window.navigationStack.clear();
-            // 压入首页作为栈的第一个元素
             window.navigationStack.push(window.location.href);
             
             searchInput = document.getElementById('searchInput');
             voiceButton = document.getElementById('voiceButton');
             cameraLink = document.querySelector('.camera-link');
 
-            // 语音图标点击事件
             voiceButton.addEventListener('click', () => {
                 showModal('语音权限请求', '需要访问您的麦克风来进行语音识别，将您的语音转换为文字。', 'voice');
             });
 
-            // 相机链接点击事件
             cameraLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 showModal('相机权限请求', '需要访问您的摄像头来进行拍照识别食材。', 'camera');
             });
 
-            // 卡片点击跳转到详情页
             document.querySelectorAll('.plan-card, .recommend-card').forEach(card => {
                 card.addEventListener('click', (e) => {
                     console.log('点击事件触发');
                     console.log('点击的元素:', e.target);
                     console.log('当前卡片:', card);
                     
-                    // 确保导航栈存在
                     console.log('导航栈是否存在:', window.navigationStack ? '是' : '否');
                     if (window.navigationStack) {
                         console.log('当前栈状态:', window.navigationStack.getStack());
-                        // 压入当前页面到导航栈
                         window.navigationStack.push(window.location.href);
                         console.log('压入后栈状态:', window.navigationStack.getStack());
                     }
                     
-                    // 跳转到详情页
                     console.log('准备跳转到详情页');
                     window.location.href = 'food_app_detail.html';
                     console.log('跳转命令已执行');
                 });
             });
 
-            // 收藏功能：点击心形图标切换状态
             document.querySelectorAll('.plan-card .heart, .recommend-card .heart').forEach(heart => {
                 heart.addEventListener('click', (e) => {
-                    e.stopPropagation(); // 防止触发卡片点击
+                    e.stopPropagation();
                     const card = heart.closest('.plan-card, .recommend-card');
                     const cardId = card.dataset.id;
                     const isFavorited = heart.classList.contains('favorited');
                     
                     if (isFavorited) {
                         heart.classList.remove('favorited');
-                        heart.style.fill = '#ffffff'; // 空心
+                        heart.style.fill = '#ffffff';
                     } else {
                         heart.classList.add('favorited');
-                        heart.style.fill = '#ff6b6b'; // 填充
+                        heart.style.fill = '#ff6b6b';
                     }
                     
-                    // 保存到localStorage
                     localStorage.setItem(`favorite_${cardId}`, !isFavorited);
                 });
             });
 
-            // 加载AI生成的菜谱
-            loadGeneratedRecipes();
-
-            // 加载收藏状态
             document.querySelectorAll('.plan-card, .recommend-card').forEach(card => {
                 const cardId = card.dataset.id;
                 const isFavorited = localStorage.getItem(`favorite_${cardId}`) === 'true';
@@ -786,78 +743,20 @@
                 }
             });
 
-            // 底部导航高亮（假设当前是首页）
             document.querySelector('.bottom-nav .nav-item:first-child').classList.add('active');
 
-            // 搜索框Enter键跳转到结果页
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     const query = searchInput.value.trim();
                     if (query) {
-                        // 确保导航栈存在
                         if (window.navigationStack) {
-                            // 压入当前页面到导航栈
                             window.navigationStack.push(window.location.href);
                         }
-                        // 跳转到结果页
                         window.location.href = `food_app_result.html?query=${encodeURIComponent(query)}`;
                     }
                 }
             });
         });
-
-            // 加载AI生成的菜谱
-            function loadGeneratedRecipes() {
-                const counter = parseInt(localStorage.getItem('recipeCounter') || '0');
-                const section = document.getElementById('generatedSection');
-                const grid = document.getElementById('generatedGrid');
-                const countLabel = document.getElementById('generatedCount');
-
-                let recipeCount = 0;
-                for (let i = 1; i <= counter; i++) {
-                    const stored = localStorage.getItem('generatedRecipe_' + i);
-                    if (stored) {
-                        try {
-                            const recipe = JSON.parse(stored);
-                            const card = document.createElement('div');
-                            card.className = 'recommend-card';
-                            card.style.cursor = 'pointer';
-
-                            const gradient = recipe.category === '中式' ? 'linear-gradient(135deg, #f8b195 0%, #f67280 50%, #c06c84 100%)' :
-                                recipe.category === '西式' ? 'linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%)' :
-                                recipe.category === '日式' ? 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)' :
-                                recipe.category === '韩式' ? 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)' :
-                                'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
-
-                            card.innerHTML = `
-                                <div class="image" style="background: ${gradient};">
-                                    <svg class="heart" viewBox="0 0 24 24">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                    </svg>
-                                </div>
-                                <div class="name">${recipe.name}</div>
-                            `;
-
-                            card.addEventListener('click', function() {
-                                if (window.navigationStack) {
-                                    window.navigationStack.push(window.location.href);
-                                }
-                                window.location.href = 'food_app_recipe_view.html?id=' + i;
-                            });
-
-                            grid.appendChild(card);
-                            recipeCount++;
-                        } catch(e) {
-                            console.error('加载菜谱失败:', e);
-                        }
-                    }
-                }
-
-                if (recipeCount > 0) {
-                    section.style.display = 'block';
-                    countLabel.textContent = recipeCount + '个';
-                }
-            }
     </script>
     <script src="touch.js"></script>
 </body>

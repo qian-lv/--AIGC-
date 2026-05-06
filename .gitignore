@@ -1,0 +1,28 @@
+# 环境变量
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 日志
+frontend.log
+*.log
+
+# 测试图片（示例用）
+test.jpg
+
+# Claude
+.claude/

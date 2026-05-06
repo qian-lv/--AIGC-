@@ -1,0 +1,289 @@
+/* 触摸体验优化样式 */
+
+/* 触摸反馈 - 按下效果 */
+.touch-active {
+    transform: scale(0.96);
+    opacity: 0.85;
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+/* 按钮触摸反馈 */
+button:active,
+.btn:active,
+.nav-item:active,
+.back-button:active,
+.setting-card:active,
+.favorite-card:active,
+.more-card:active,
+.plan-card:active,
+.recommend-card:active,
+.card:active {
+    transform: scale(0.96);
+    opacity: 0.85;
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+/* 链接触摸反馈 */
+a:active {
+    opacity: 0.7;
+    transition: opacity 0.15s ease-out;
+}
+
+/* 卡片触摸反馈 - 轻微上浮效果 */
+.touch-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.touch-lift:active {
+    transform: translateY(-2px) scale(0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 页面过渡动画容器 */
+.page-transition {
+    position: relative;
+    overflow: hidden;
+}
+
+/* 滑入动画 */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0.8;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0.8;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-30%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(30%);
+        opacity: 0;
+    }
+}
+
+/* 淡入淡出动画 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* 页面过渡类 */
+.page-enter {
+    animation: slideInRight 0.3s ease-out forwards;
+}
+
+.page-exit {
+    animation: slideOutLeft 0.3s ease-out forwards;
+}
+
+/* 加载动画 */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* 旋转加载 */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* 触摸波纹效果 */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease-out, height 0.3s ease-out;
+}
+
+.ripple:active::after {
+    width: 200%;
+    height: 200%;
+}
+
+/* 弹性滚动 */
+.elastic-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* 触摸禁用选择 */
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 长按菜单 */
+.long-press-menu {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 10000;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.long-press-menu.active {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* 滑动手势提示 */
+.swipe-hint {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.swipe-hint.show {
+    opacity: 1;
+}
+
+/* 下拉刷新 */
+.pull-to-refresh {
+    position: relative;
+    overflow: hidden;
+}
+
+.pull-to-refresh::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f2c94c;
+    border-top-color: transparent;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, top 0.3s ease-out;
+}
+
+.pull-to-refresh.refreshing::before {
+    opacity: 1;
+    top: 10px;
+    animation: spin 1s linear infinite;
+}
+
+/* 触摸反馈颜色变量 */
+:root {
+    --touch-color-active: rgba(242, 160, 79, 0.2);
+    --touch-color-ripple: rgba(255, 255, 255, 0.4);
+    --touch-duration: 0.15s;
+    --touch-easing: ease-out;
+}
+
+/* 通用触摸反馈混入 - 用于普通元素 */
+.interactive {
+    cursor: pointer;
+    transition: transform var(--touch-duration) var(--touch-easing),
+                opacity var(--touch-duration) var(--touch-easing);
+    -webkit-tap-highlight-color: var(--touch-color-active);
+    -webkit-touch-callout: none;
+}
+
+.interactive:active {
+    transform: scale(0.96);
+    opacity: 0.85;
+}

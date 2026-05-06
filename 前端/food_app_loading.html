@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正在识别 - 烹小灵</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="touch.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .app-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <img src="images/app_icon.png" alt="烹小灵" class="app-logo">
+        <h1>烹小灵</h1>
+        <div class="loading-spinner"></div>
+        <p class="loading-text" id="loadingText">正在识别食材...</p>
+        <p class="loading-subtext" id="loadingSubtext">请稍候，AI正在分析...</p>
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <script>
+        const backendUrl = "http://localhost:8085";
+
+        const imageData = localStorage.getItem('captureImage');
+
+        if (!imageData) {
+            document.getElementById('loadingText').textContent = '错误';
+            document.getElementById('loadingSubtext').textContent = '未找到图片数据';
+            document.getElementById('errorMessage').textContent = '请重新拍照';
+            setTimeout(() => {
+                window.location.href = 'food_app_camera.html';
+            }, 3000);
+        } else {
+            recognizeIngredients();
+        }
+
+        // 清除上一次的菜谱数据和对话记录
+        function clearOldRecipeData() {
+            const counter = parseInt(localStorage.getItem('recipeCounter') || '0');
+            for (let i = counter; i >= 1; i--) {
+                localStorage.removeItem('generatedRecipe_' + i);
+            }
+            localStorage.removeItem('recipeCounter');
+            localStorage.removeItem('lastAiPrompt');
+            localStorage.removeItem('lastAiResponse');
+            console.log('已清除旧菜谱数据, 共清理 ' + counter + ' 个卡片');
+        }
+
+        async function recognizeIngredients() {
+            try {
+                const blob = await fetch(imageData).then(res => res.blob());
+
+                const formData = new FormData();
+                formData.append('image', blob, 'capture.jpg');
+
+                console.log('正在调用后端API:', backendUrl + '/detect');
+
+                const response = await fetch(backendUrl + '/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.ingredients) {
+                    // 清除旧的菜谱数据，确保新识别结果不会混入旧数据
+                    clearOldRecipeData();
+                    localStorage.setItem('foodRecognitionResult', JSON.stringify(result));
+                    window.location.href = 'food_app_result.html';
+                } else {
+                    document.getElementById('loadingText').textContent = '识别失败';
+                    document.getElementById('loadingSubtext').textContent = result.error || '请重试';
+                    document.getElementById('errorMessage').textContent = '点击返回重试';
+
+                    document.querySelector('.loading-container').addEventListener('click', () => {
+                        window.location.href = 'food_app_camera.html';
+                    });
+                }
+            } catch (error) {
+                console.error('识别错误:', error);
+                document.getElementById('loadingText').textContent = '网络错误';
+                document.getElementById('loadingSubtext').textContent = '请检查网络连接';
+                document.getElementById('errorMessage').textContent = '点击返回重试';
+
+                document.querySelector('.loading-container').addEventListener('click', () => {
+                    window.location.href = 'food_app_camera.html';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

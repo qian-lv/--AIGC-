@@ -22,6 +22,7 @@
         .highlight { background: linear-gradient(135deg, #ffe9c8 0%, #ffd7a4 100%); }
         .footer { padding: 0 20px 30px; }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     <div class="header">
@@ -118,14 +119,15 @@
                         window.location.href = previousUrl;
                     } else {
                         // 如果栈为空，默认返回首页
-                        window.location.href = 'food_app_home.html';
+                        window.location.href = 'index.html';
                     }
                 } else {
                     // 如果导航栈不存在，默认返回首页
-                    window.location.href = 'food_app_home.html';
+                    window.location.href = 'index.html';
                 }
             });
         });
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

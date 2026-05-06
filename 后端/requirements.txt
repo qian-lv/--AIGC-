@@ -1,4 +1,6 @@
-Flask==2.3.3
-flask-cors==6.0.2
-requests==2.31.0
-openai==1.0.0  # 可选，用于OpenAI兼容库
+fastapi>=0.100.0
+uvicorn>=0.20.0
+python-multipart>=0.0.6
+zhipuai>=2.0.0
+python-dotenv>=1.0.0
+mangum>=0.17.0
