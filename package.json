@@ -1,0 +1,21 @@
+{
+  "name": "food_app",
+  "version": "1.0.0",
+  "description": "烹小灵用于参加AIGC比赛的项目",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qian-lv/--AIGC-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/qian-lv/--AIGC-/issues"
+  },
+  "homepage": "https://github.com/qian-lv/--AIGC-#readme"
+}
