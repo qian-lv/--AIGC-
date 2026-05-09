@@ -13,13 +13,11 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            width: 414px;
-            height: 896px;
-            margin: 0 auto;
+            width: 100%;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
         }
         .title-section {
             width: 100%;
@@ -61,8 +59,6 @@
             text-align: center;
         }
         .recipe-list {
-            flex: 1;
-            overflow-y: auto;
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -192,12 +188,47 @@
             overflow-wrap: break-word;
             overflow-y: auto;
         }
+        .food-recognition-panel {
+            width: 100%;
+            padding: 20px;
+            background-color: #e8f5e8;
+            border-bottom: 1px solid #c8e6c9;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .food-recognition-panel h3 {
+            color: #2e7d32;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .food-recognition-panel .recognition-result {
+            width: 100%;
+            min-height: 120px;
+            max-height: 180px;
+            border: 1px solid #c8e6c9;
+            border-radius: 16px;
+            padding: 16px;
+            background-color: #ffffff;
+            color: #333333;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            overflow-y: auto;
+        }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     <div class="title-section">
         <a href="#" class="back-button" id="backButton"></a>
         <h1>您的专属食谱已生成</h1>
+    </div>
+    
+    <!-- 食材识别结果面板 -->
+    <div class="food-recognition-panel" id="foodRecognitionPanel" style="display: none;">
+        <h3>食材识别结果</h3>
+        <div class="recognition-result" id="recognitionResult">识别结果将显示在这里。</div>
     </div>
     
     <div class="ai-panel">
@@ -229,7 +260,7 @@
         
         <a href="food_app_detail_italian.html" class="recipe-card-link">
             <div class="recipe-card">
-                <div class="image-area" style="background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%);">
+                <div class="image-area" style="background: url('picture/italian Pasta.png') center/cover no-repeat;">
                     <div class="category-tag" style="background-color: #ff6b6b;">西式</div>
                     <div class="overlay">
                         <div class="recipe-name">意大利面</div>
@@ -242,10 +273,10 @@
                 </div>
             </div>
         </a>
-        
+
         <a href="food_app_detail_sushi.html" class="recipe-card-link">
             <div class="recipe-card">
-                <div class="image-area" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                <div class="image-area" style="background: url('picture/Fish Curry.png') center/cover no-repeat;">
                     <div class="category-tag" style="background-color: #4ecdc4;">日式</div>
                     <div class="overlay">
                         <div class="recipe-name">寿司拼盘</div>
@@ -258,10 +289,10 @@
                 </div>
             </div>
         </a>
-        
+
         <a href="food_app_detail_korean.html" class="recipe-card-link">
             <div class="recipe-card">
-                <div class="image-area" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                <div class="image-area" style="background: url('picture/Beef Steak.png') center/cover no-repeat;">
                     <div class="category-tag" style="background-color: #a8e6cf;">韩式</div>
                     <div class="overlay">
                         <div class="recipe-name">韩式烤肉</div>
@@ -274,10 +305,10 @@
                 </div>
             </div>
         </a>
-        
+
         <a href="food_app_detail_dessert.html" class="recipe-card-link">
             <div class="recipe-card">
-                <div class="image-area" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                <div class="image-area" style="background: url('picture/Chicken Salad.png') center/cover no-repeat;">
                     <div class="category-tag" style="background-color: #f2c94c;">甜点</div>
                     <div class="overlay">
                         <div class="recipe-name">法式甜点</div>
@@ -291,56 +322,107 @@
             </div>
         </a>
     </div>
+    <script src="common.js"></script>
     <script src="navigation.js"></script>
     <script>
-        // 确保导航栈是一个有效的实例
-        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
-            window.navigationStack = {
-                stack: [],
-                push: function(url) {
-                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
-                        console.log('页面已在栈顶，无需重复压入:', url);
-                        return;
-                    }
-                    if (this.stack.length >= 10) {
-                        this.stack.shift();
-                    }
-                    this.stack.push(url);
-                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                    console.log('压入页面:', url, '当前栈:', this.stack);
-                },
-                pop: function() {
-                    if (this.stack.length > 1) {
-                        this.stack.pop();
-                        const previousUrl = this.stack[this.stack.length - 1];
-                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
-                        return previousUrl;
-                    }
-                    console.log('栈为空或只有一个页面，无法返回');
-                    return null;
-                },
-                getStack: function() {
-                    return this.stack;
-                }
-            };
-        }
-        
-        // 确保当前页面在导航栈中
-        const currentUrl = window.location.href;
-        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
-            window.navigationStack.push(currentUrl);
-        }
-        
         const generateButton = document.getElementById('generateButton');
         const aiQuery = document.getElementById('aiQuery');
         const aiResult = document.getElementById('aiResult');
         const aiStatus = document.getElementById('aiStatus');
         const backButton = document.getElementById('backButton');
+        const foodRecognitionPanel = document.getElementById('foodRecognitionPanel');
+        const recognitionResult = document.getElementById('recognitionResult');
+
+        // 显示食材识别结果
+        function displayFoodRecognitionResult() {
+            const recognitionData = localStorage.getItem('foodRecognitionResult');
+            if (recognitionData) {
+                try {
+                    const data = JSON.parse(recognitionData);
+                    if (data.ingredients) {
+                        const ingredientsList = data.ingredients.join('、');
+                        recognitionResult.textContent = `识别到的食材：${ingredientsList}`;
+                        foodRecognitionPanel.style.display = 'flex';
+                    }
+                } catch (error) {
+                    console.error('解析识别结果失败:', error);
+                }
+            }
+        }
 
         function getQueryParam(name) {
             const params = new URLSearchParams(window.location.search);
             return params.get(name) || '';
+        }
+
+        // 存储生成的菜谱数据
+        let recipeCounter = parseInt(localStorage.getItem('recipeCounter') || '0');
+
+        // 创建菜谱卡片DOM元素
+        function createRecipeCard(recipe, index) {
+            const link = document.createElement('a');
+            link.href = 'food_app_recipe_view.html?id=' + index;
+            link.className = 'recipe-card-link';
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = link.getAttribute('href');
+            });
+
+            const categoryColors = {
+                '中式': '#f2c94c', '西式': '#ff6b6b', '日式': '#4ecdc4',
+                '韩式': '#a8e6cf', '甜点': '#f2c94c'
+            };
+            const bgColor = categoryColors[recipe.category] || '#f2c94c';
+            const categoryStyle = {
+                '中式': { emoji: '🥟', gradient: 'linear-gradient(135deg, #f8b195 0%, #f67280 50%, #c06c84 100%)' },
+                '西式': { emoji: '🍝', gradient: 'linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%)' },
+                '日式': { emoji: '🍣', gradient: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)' },
+                '韩式': { emoji: '🥘', gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)' },
+                '甜点': { emoji: '🍰', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' }
+            };
+            const style = categoryStyle[recipe.category] || { emoji: '🍽️', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%)' };
+
+            link.innerHTML = `
+                <div class="recipe-card">
+                    <div class="image-area" style="background: ${style.gradient}; display: flex; align-items: center; justify-content: center;">
+                        <div class="card-emoji" style="font-size: 72px; opacity: 0.5;">${style.emoji}</div>
+                        <div class="category-tag" style="background-color: ${bgColor}; position: absolute; top: 12px; left: 12px;">${recipe.category || '推荐'}</div>
+                        <div class="overlay">
+                            <div class="recipe-name">${recipe.name}</div>
+                            <div class="recipe-info">
+                                <div class="time-info">制作时长：${recipe.cook_time || '未知'}</div>
+                                <div class="rating-info">推荐指数：${recipe.rating || '★★★★'}</div>
+                            </div>
+                            <div class="flavor-tag">口味：${recipe.flavor || '美味'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 异步加载真实图片（5秒超时）
+            const keyword = encodeURIComponent(recipe.name || '');
+            const imageArea = link.querySelector('.image-area');
+            const controller = new AbortController();
+            var timeoutId = setTimeout(function() { controller.abort(); }, 5000);
+            fetch(backendUrl + '/api/search-image?q=' + keyword, { signal: controller.signal })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    clearTimeout(timeoutId);
+                    if (data.image_url) {
+                        var img = new Image();
+                        img.onload = function() {
+                            imageArea.style.backgroundImage = "url('" + data.image_url + "')";
+                            imageArea.style.backgroundSize = 'cover';
+                            imageArea.style.backgroundPosition = 'center';
+                            var emoji = imageArea.querySelector('.card-emoji');
+                            if (emoji) emoji.style.display = 'none';
+                        };
+                        img.src = data.image_url;
+                    }
+                })
+                .catch(function() { clearTimeout(timeoutId); });
+
+            return link;
         }
 
         async function generateRecipe() {
@@ -353,21 +435,50 @@
             aiStatus.textContent = '生成中...';
             aiResult.textContent = '正在请求后端AI接口，请稍候。';
 
+            // 获取识别到的食材
+            let ingredients = [];
             try {
-                const response = await fetch('http://127.0.0.1:5000/api/chat', {
+                const recognitionData = localStorage.getItem('foodRecognitionResult');
+                if (recognitionData) {
+                    const data = JSON.parse(recognitionData);
+                    ingredients = data.ingredients || [];
+                }
+            } catch (e) {
+                console.error('读取食材识别结果失败:', e);
+            }
+
+            try {
+                // 一次调用：同时获得简短推荐 + 结构化菜谱
+                const resp = await fetch(backendUrl + '/api/generate-recipe-structured', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: prompt })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ingredients: ingredients, preference: prompt })
                 });
 
-                const data = await response.json();
-                if (response.ok && data.reply) {
-                    aiResult.textContent = data.reply;
+                const data = await resp.json();
+                if (resp.ok && data.recipe) {
+                    // 显示简短推荐文字
+                    if (data.summary) {
+                        aiResult.textContent = data.summary;
+                    }
                     aiStatus.textContent = '生成成功';
+                    // 保存对话记录到localStorage
+                    localStorage.setItem('lastAiPrompt', prompt);
+                    localStorage.setItem('lastAiResponse', data.summary || '');
+
+                    // 创建菜谱卡片
+                    const recipe = data.recipe;
+                    recipeCounter++;
+                    localStorage.setItem('recipeCounter', String(recipeCounter));
+                    localStorage.setItem('generatedRecipe_' + recipeCounter, JSON.stringify(recipe));
+
+                    const card = createRecipeCard(recipe, recipeCounter);
+                    const recipeList = document.querySelector('.recipe-list');
+                    recipeList.insertBefore(card, recipeList.firstChild);
+
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 } else {
-                    aiResult.textContent = data.error || '生成失败，请重试。';
+                    aiResult.textContent = data.detail || data.error || '生成失败，请重试。';
                     aiStatus.textContent = '请求失败';
                 }
             } catch (error) {
@@ -376,25 +487,41 @@
             }
         }
 
-        function autoGenerateFromQuery() {
+        // 页面加载时自动填入搜索词（来自首页搜索框），但不自动生成
+        function autoFillSearchQuery() {
             const initialQuery = getQueryParam('query');
             if (initialQuery) {
                 aiQuery.value = initialQuery;
-                generateRecipe();
+            }
+        }
+
+        // 页面加载时从 localStorage 恢复之前生成的菜谱卡片
+        function loadGeneratedRecipeCards() {
+            const counter = parseInt(localStorage.getItem('recipeCounter') || '0');
+            const recipeList = document.querySelector('.recipe-list');
+            let count = 0;
+            for (let i = counter; i >= 1; i--) {
+                const stored = localStorage.getItem('generatedRecipe_' + i);
+                if (stored) {
+                    try {
+                        const recipe = JSON.parse(stored);
+                        const card = createRecipeCard(recipe, i);
+                        recipeList.insertBefore(card, recipeList.firstChild);
+                        count++;
+                    } catch (e) {
+                        console.error('加载已保存的菜谱卡片失败:', e);
+                    }
+                }
+            }
+            if (count > 0) {
+                console.log('已恢复 ' + count + ' 个菜谱卡片');
             }
         }
 
         generateButton.addEventListener('click', generateRecipe);
         backButton.addEventListener('click', function(e) {
             e.preventDefault();
-            if (window.navigationStack) {
-                const previousUrl = window.navigationStack.pop();
-                if (previousUrl) {
-                    window.location.href = previousUrl;
-                } else {
-                    window.location.href = 'food_app_home.html';
-                }
-            }
+            history.back();
         });
         
         // 为食谱卡片链接添加导航栈处理
@@ -403,14 +530,31 @@
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetUrl = link.getAttribute('href');
-                if (window.navigationStack) {
-                    window.navigationStack.push(window.location.href);
-                }
                 window.location.href = targetUrl;
             });
         });
         
-        autoGenerateFromQuery();
+        // 页面加载时恢复上一次的AI对话记录
+        function restoreChatHistory() {
+            const savedPrompt = localStorage.getItem('lastAiPrompt');
+            const savedResponse = localStorage.getItem('lastAiResponse');
+            if (savedPrompt) {
+                aiQuery.value = savedPrompt;
+            }
+            if (savedResponse) {
+                aiResult.textContent = savedResponse;
+                aiStatus.textContent = '生成成功';
+            }
+        }
+
+        // 页面加载时显示食材识别结果
+        displayFoodRecognitionResult();
+        // 恢复上一次的AI对话
+        restoreChatHistory();
+        // 恢复之前生成的菜谱卡片
+        loadGeneratedRecipeCards();
+        autoFillSearchQuery();
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

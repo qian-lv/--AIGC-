@@ -266,6 +266,7 @@
             margin: 8px auto;
         }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     <div class="image-section">
@@ -347,60 +348,12 @@
     <div class="ios-indicator"></div>
     <script src="navigation.js"></script>
     <script>
-        // 确保导航栈是一个有效的实例
-        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
-            window.navigationStack = {
-                stack: [],
-                push: function(url) {
-                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
-                        console.log('页面已在栈顶，无需重复压入:', url);
-                        return;
-                    }
-                    if (this.stack.length >= 10) {
-                        this.stack.shift();
-                    }
-                    this.stack.push(url);
-                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                    console.log('压入页面:', url, '当前栈:', this.stack);
-                },
-                pop: function() {
-                    if (this.stack.length > 1) {
-                        this.stack.pop();
-                        const previousUrl = this.stack[this.stack.length - 1];
-                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
-                        return previousUrl;
-                    }
-                    console.log('栈为空或只有一个页面，无法返回');
-                    return null;
-                },
-                getStack: function() {
-                    return this.stack;
-                }
-            };
-        }
-        
-        // 确保当前页面在导航栈中
-        const currentUrl = window.location.href;
-        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
-            window.navigationStack.push(currentUrl);
-        }
-        
         document.addEventListener('DOMContentLoaded', function() {
             // 返回按钮事件处理
             const backButton = document.getElementById('backButton');
             backButton.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (window.navigationStack) {
-                    const previousUrl = window.navigationStack.pop();
-                    if (previousUrl) {
-                        window.location.href = previousUrl;
-                    } else {
-                        window.location.href = 'food_app_home.html';
-                    }
-                } else {
-                    window.location.href = 'food_app_home.html';
-                }
+                goBack();
             });
             
             // 开始做饭按钮事件处理
@@ -409,9 +362,6 @@
                 const textElement = item.querySelector('.text');
                 if (textElement && textElement.textContent === '开始做饭') {
                     item.addEventListener('click', function() {
-                        if (window.navigationStack) {
-                            window.navigationStack.push(window.location.href);
-                        }
                         window.location.href = 'food_app_video_call.html';
                     });
                     item.style.cursor = 'pointer';
@@ -419,5 +369,6 @@
             });
         });
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

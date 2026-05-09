@@ -6,7 +6,7 @@
     <title>美食APP - 按分类选菜</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background-color: #f0f0f0; min-height: 100vh; color: #2f2f2f; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; min-height: 100dvh; color: #2f2f2f; width: 100%; }
         .header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
         .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff4e1; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #333; }
         .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #333; border-bottom: 2px solid #333; transform: rotate(45deg); }
@@ -31,6 +31,8 @@
         .view-more { padding: 0 20px 28px; }
         .view-more a { color: #d87e31; text-decoration: none; font-size: 14px; font-weight: 700; }
     </style>
+    <link rel="stylesheet" href="touch.css">
+    
 </head>
 <body>
     <div class="header">
@@ -111,45 +113,6 @@
     </div>
     <script src="navigation.js"></script>
     <script>
-        // 确保导航栈是一个有效的实例
-        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
-            window.navigationStack = {
-                stack: [],
-                push: function(url) {
-                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
-                        console.log('页面已在栈顶，无需重复压入:', url);
-                        return;
-                    }
-                    if (this.stack.length >= 10) {
-                        this.stack.shift();
-                    }
-                    this.stack.push(url);
-                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                    console.log('压入页面:', url, '当前栈:', this.stack);
-                },
-                pop: function() {
-                    if (this.stack.length > 1) {
-                        this.stack.pop();
-                        const previousUrl = this.stack[this.stack.length - 1];
-                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
-                        return previousUrl;
-                    }
-                    console.log('栈为空或只有一个页面，无法返回');
-                    return null;
-                },
-                getStack: function() {
-                    return this.stack;
-                }
-            };
-        }
-        
-        // 确保当前页面在导航栈中
-        const currentUrl = window.location.href;
-        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
-            window.navigationStack.push(currentUrl);
-        }
-        
         document.querySelectorAll('.filter-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 chip.classList.toggle('active');
@@ -159,41 +122,29 @@
         const backButton = document.getElementById('backButton');
         backButton.addEventListener('click', function(e) {
             e.preventDefault();
-            if (window.navigationStack) {
-                const previousUrl = window.navigationStack.pop();
-                if (previousUrl) {
-                    window.location.href = previousUrl;
-                } else {
-                    window.location.href = 'food_app_home.html';
-                }
-            }
+            goBack();
         });
         
-        // 为食谱卡片链接添加导航栈处理
+        // 为食谱卡片链接处理点击事件
         const dishLinks = document.querySelectorAll('.dish-card');
         dishLinks.forEach(function(link) {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetUrl = link.getAttribute('href');
-                if (window.navigationStack) {
-                    window.navigationStack.push(window.location.href);
-                }
                 window.location.href = targetUrl;
             });
         });
         
-        // 为查看更多链接添加导航栈处理
+        // 为查看更多链接处理点击事件
         const viewMoreLink = document.querySelector('.view-more a');
         if (viewMoreLink) {
             viewMoreLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetUrl = viewMoreLink.getAttribute('href');
-                if (window.navigationStack) {
-                    window.navigationStack.push(window.location.href);
-                }
                 window.location.href = targetUrl;
             });
         }
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

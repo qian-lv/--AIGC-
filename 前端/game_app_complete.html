@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=414, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>游戏APP - 结算完成页</title>
     <style>
         * {
@@ -16,8 +16,8 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #4CAF50;
-            width: 414px;
-            height: 896px;
+            width: 100%;
+            min-height: 100vh;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -191,6 +191,7 @@
             background-color: #757575;
         }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     <div class="top-decoration"></div>
@@ -228,9 +229,10 @@
         </div>
         
         <div class="buttons-section">
-            <a href="food_app_home.html" class="button button-blue">完成</a>
+            <a href="index.html" class="button button-blue">完成</a>
             <a href="#" class="button button-gray">留念</a>
         </div>
     </div>
+    <script src="touch.js"></script>
 </body>
 </html>

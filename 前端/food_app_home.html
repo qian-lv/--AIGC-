@@ -13,14 +13,9 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            height: 100vh;
-            max-width: 414px; /* 模拟iPhone 11 Pro Max的宽度 */
-            max-height: 896px; /* 模拟iPhone 11 Pro Max的高度 */
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            min-height: 100dvh;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
         }
         .user-info {
             width: 100%;
@@ -112,9 +107,7 @@
             outline: none;
         }
         .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 20px 100px;
+            padding: 0 20px;
         }
         .section {
             margin-bottom: 30px;
@@ -275,7 +268,9 @@
             line-height: 1.6;
         }
         .bottom-nav {
-            position: relative;
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
             height: 80px;
             background-color: #ffffff;
@@ -284,7 +279,7 @@
             align-items: center;
             padding-bottom: env(safe-area-inset-bottom);
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            margin-top: auto;
+            z-index: 100;
         }
         .nav-item {
             display: flex;
@@ -369,6 +364,7 @@
             color: #333;
         }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     
@@ -456,7 +452,7 @@
             </div>
             <div class="recommend-grid">
                 <div class="recommend-card" data-id="italian-pasta">
-                    <div class="image">
+                    <div class="image" style="background: url('picture/italian Pasta.png') center/cover no-repeat;">
                         <svg class="heart" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
@@ -464,7 +460,7 @@
                     <div class="name">Italian Pasta</div>
                 </div>
                 <div class="recommend-card" data-id="chicken-salad">
-                    <div class="image" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">
+                    <div class="image" style="background: url('picture/Chicken Salad.png') center/cover no-repeat;">
                         <svg class="heart" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
@@ -472,7 +468,7 @@
                     <div class="name">Chicken Salad</div>
                 </div>
                 <div class="recommend-card" data-id="beef-steak">
-                    <div class="image" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                    <div class="image" style="background: url('picture/Beef Steak.png') center/cover no-repeat;">
                         <svg class="heart" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
@@ -480,7 +476,7 @@
                     <div class="name">Beef Steak</div>
                 </div>
                 <div class="recommend-card" data-id="fish-curry">
-                    <div class="image" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                    <div class="image" style="background: url('picture/Fish Curry.png') center/cover no-repeat;">
                         <svg class="heart" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
@@ -488,6 +484,14 @@
                     <div class="name">Fish Curry</div>
                 </div>
             </div>
+        </div>
+
+        <div class="section" id="generatedSection" style="display:none;">
+            <div class="section-header">
+                <div class="title">AI生成的菜谱</div>
+                <div class="view-all" id="generatedCount">0个</div>
+            </div>
+            <div class="recommend-grid" id="generatedGrid"></div>
         </div>
         
         <div class="section">
@@ -547,28 +551,14 @@
         </div>
     </div>
     
+    <script src="common.js"></script>
     <script src="navigation.js"></script>
     <script>
-        // 导航函数，用于处理底部导航栏跳转
-        function navigateTo(url) {
-            // 确保导航栈存在
-            if (window.navigationStack) {
-                // 压入当前页面到导航栈
-                window.navigationStack.push(window.location.href);
-            }
-            // 跳转到目标页面
-            window.location.href = url;
-        }
-
         let currentAction = null;
         let searchInput, voiceButton, cameraLink;
         
         // 显示弹窗
         function showModal(title, message, action) {
-            // 将当前页面压入导航栈
-            if (window.navigationStack) {
-                window.navigationStack.push(window.location.href);
-            }
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalMessage').textContent = message;
             currentAction = action;
@@ -578,13 +568,6 @@
         // 关闭弹窗
         function closeModal() {
             document.getElementById('permissionModal').style.display = 'none';
-            // 从导航栈中弹出
-            if (window.navigationStack) {
-                const previousUrl = window.navigationStack.pop();
-                if (previousUrl) {
-                    window.location.href = previousUrl;
-                }
-            }
             currentAction = null;
         }
 
@@ -594,9 +577,6 @@
                 startVoiceAccess();
             } else if (currentAction === 'camera') {
                 // 无论摄像头是否正常打开，都跳转到相机页面
-                if (window.navigationStack) {
-                    window.navigationStack.push(window.location.href);
-                }
                 window.location.href = 'food_app_camera.html';
             }
             document.getElementById('permissionModal').style.display = 'none';
@@ -660,49 +640,6 @@
 
         // 确保DOM加载完成后再执行代码
         document.addEventListener('DOMContentLoaded', function() {
-            // 确保导航栈是一个有效的实例
-            if (!window.navigationStack || typeof window.navigationStack.clear !== 'function') {
-                // 如果导航栈不存在或不是有效的实例，创建一个新的
-                window.navigationStack = {
-                    stack: [],
-                    clear: function() {
-                        this.stack = [];
-                        localStorage.removeItem('navigationStack');
-                        console.log('导航栈已清空');
-                    },
-                    push: function(url) {
-                        if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
-                            console.log('页面已在栈顶，无需重复压入:', url);
-                            return;
-                        }
-                        if (this.stack.length >= 10) {
-                            this.stack.shift();
-                        }
-                        this.stack.push(url);
-                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                        console.log('压入页面:', url, '当前栈:', this.stack);
-                    },
-                    pop: function() {
-                        if (this.stack.length > 1) {
-                            this.stack.pop();
-                            const previousUrl = this.stack[this.stack.length - 1];
-                            localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                            console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
-                            return previousUrl;
-                        }
-                        console.log('栈为空或只有一个页面，无法返回');
-                        return null;
-                    },
-                    getStack: function() {
-                        return this.stack;
-                    }
-                };
-            }
-            // 首页加载时清空导航栈，确保从首页开始的导航是正确的
-            window.navigationStack.clear();
-            // 压入首页作为栈的第一个元素
-            window.navigationStack.push(window.location.href);
-            
             searchInput = document.getElementById('searchInput');
             voiceButton = document.getElementById('voiceButton');
             cameraLink = document.querySelector('.camera-link');
@@ -724,16 +661,7 @@
                     console.log('点击事件触发');
                     console.log('点击的元素:', e.target);
                     console.log('当前卡片:', card);
-                    
-                    // 确保导航栈存在
-                    console.log('导航栈是否存在:', window.navigationStack ? '是' : '否');
-                    if (window.navigationStack) {
-                        console.log('当前栈状态:', window.navigationStack.getStack());
-                        // 压入当前页面到导航栈
-                        window.navigationStack.push(window.location.href);
-                        console.log('压入后栈状态:', window.navigationStack.getStack());
-                    }
-                    
+
                     // 跳转到详情页
                     console.log('准备跳转到详情页');
                     window.location.href = 'food_app_detail.html';
@@ -762,6 +690,9 @@
                 });
             });
 
+            // 加载AI生成的菜谱
+            loadGeneratedRecipes();
+
             // 加载收藏状态
             document.querySelectorAll('.plan-card, .recommend-card').forEach(card => {
                 const cardId = card.dataset.id;
@@ -782,17 +713,90 @@
                 if (e.key === 'Enter') {
                     const query = searchInput.value.trim();
                     if (query) {
-                        // 确保导航栈存在
-                        if (window.navigationStack) {
-                            // 压入当前页面到导航栈
-                            window.navigationStack.push(window.location.href);
-                        }
                         // 跳转到结果页
                         window.location.href = `food_app_result.html?query=${encodeURIComponent(query)}`;
                     }
                 }
             });
         });
+
+            // 加载AI生成的菜谱
+            function loadGeneratedRecipes() {
+                const counter = parseInt(localStorage.getItem('recipeCounter') || '0');
+                const section = document.getElementById('generatedSection');
+                const grid = document.getElementById('generatedGrid');
+                const countLabel = document.getElementById('generatedCount');
+
+                let recipeCount = 0;
+                for (let i = 1; i <= counter; i++) {
+                    const stored = localStorage.getItem('generatedRecipe_' + i);
+                    if (stored) {
+                        try {
+                            const recipe = JSON.parse(stored);
+                            const card = document.createElement('div');
+                            card.className = 'recommend-card';
+                            card.style.cursor = 'pointer';
+
+                            const categoryStyle = {
+                                '中式': { emoji: '🥟', gradient: 'linear-gradient(135deg, #f8b195 0%, #f67280 50%, #c06c84 100%)' },
+                                '西式': { emoji: '🍝', gradient: 'linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%)' },
+                                '日式': { emoji: '🍣', gradient: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)' },
+                                '韩式': { emoji: '🥘', gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)' },
+                                '甜点': { emoji: '🍰', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' }
+                            };
+                            const style = categoryStyle[recipe.category] || { emoji: '🍽️', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%)' };
+
+                            card.innerHTML = `
+                                <div class="image" style="background: ${style.gradient}; display: flex; align-items: center; justify-content: center;">
+                                    <div class="card-emoji" style="font-size: 48px; opacity: 0.5;">${style.emoji}</div>
+                                    <svg class="heart" viewBox="0 0 24 24" style="position: absolute; top: 10px; right: 10px;">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </div>
+                                <div class="name">${recipe.name}</div>
+                            `;
+
+                            // 异步加载真实图片（5秒超时）
+                            const imgKeyword = encodeURIComponent(recipe.name || '');
+                            const imageDiv = card.querySelector('.image');
+                            const controller = new AbortController();
+                            var timeoutId = setTimeout(function() { controller.abort(); }, 5000);
+                            fetch(backendUrl + '/api/search-image?q=' + imgKeyword, { signal: controller.signal })
+                                .then(function(r) { return r.json(); })
+                                .then(function(data) {
+                                    clearTimeout(timeoutId);
+                                    if (data.image_url) {
+                                        var img = new Image();
+                                        img.onload = function() {
+                                            imageDiv.style.backgroundImage = "url('" + data.image_url + "')";
+                                            imageDiv.style.backgroundSize = 'cover';
+                                            imageDiv.style.backgroundPosition = 'center';
+                                            var emoji = imageDiv.querySelector('.card-emoji');
+                                            if (emoji) emoji.style.display = 'none';
+                                        };
+                                        img.src = data.image_url;
+                                    }
+                                })
+                                .catch(function() { clearTimeout(timeoutId); });
+
+                            card.addEventListener('click', function() {
+                                window.location.href = 'food_app_recipe_view.html?id=' + i;
+                            });
+
+                            grid.appendChild(card);
+                            recipeCount++;
+                        } catch(e) {
+                            console.error('加载菜谱失败:', e);
+                        }
+                    }
+                }
+
+                if (recipeCount > 0) {
+                    section.style.display = 'block';
+                    countLabel.textContent = recipeCount + '个';
+                }
+            }
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

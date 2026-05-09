@@ -6,7 +6,7 @@
     <title>美食APP - 收藏</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: "Helvetica Neue", Arial, sans-serif; background: #f0f0f0; color: #3b3b3b; min-height: 100vh; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        body { font-family: "Helvetica Neue", Arial, sans-serif; background: #f0f0f0; color: #3b3b3b; min-height: 100dvh; width: 100%; }
         .header { display: flex; align-items: center; gap: 12px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
         .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff4e4; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #3b3b3b; }
         .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #3b3b3b; border-bottom: 2px solid #3b3b3b; transform: rotate(45deg); }
@@ -25,6 +25,7 @@
         .empty-state .button { display: inline-flex; margin-top: 14px; padding: 10px 16px; border-radius: 999px; background: #ffe1b3; color: #bb6d1e; text-decoration: none; font-size: 13px; font-weight: 700; }
         .footer { padding: 0 20px 30px; }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     <div class="header">
@@ -43,44 +44,6 @@
     <div class="footer"></div>
     <script src="navigation.js"></script>
     <script>
-        // 确保导航栈是一个有效的实例
-        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
-            window.navigationStack = {
-                stack: [],
-                push: function(url) {
-                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
-                        console.log('页面已在栈顶，无需重复压入:', url);
-                        return;
-                    }
-                    if (this.stack.length >= 10) {
-                        this.stack.shift();
-                    }
-                    this.stack.push(url);
-                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                    console.log('压入页面:', url, '当前栈:', this.stack);
-                },
-                pop: function() {
-                    if (this.stack.length > 1) {
-                        this.stack.pop();
-                        const previousUrl = this.stack[this.stack.length - 1];
-                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
-                        return previousUrl;
-                    }
-                    console.log('栈为空或只有一个页面，无法返回');
-                    return null;
-                },
-                getStack: function() {
-                    return this.stack;
-                }
-            };
-        }
-        
-        // 确保当前页面在导航栈中
-        const currentUrl = window.location.href;
-        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
-            window.navigationStack.push(currentUrl);
-        }
         
         const favoriteMap = {
             plan1: { name: '经典红烧肉', tag: '家常', desc: '慢火炖煮，肥而不腻，是最受欢迎的家庭宴客菜。', query: '经典红烧肉菜谱', meta: ['45分钟', '中式', '浓郁'] },
@@ -99,16 +62,7 @@
         // 返回按钮点击事件
         backButton.addEventListener('click', function(e) {
             e.preventDefault();
-            if (window.navigationStack) {
-                const previousUrl = window.navigationStack.pop();
-                if (previousUrl) {
-                    window.location.href = previousUrl;
-                } else {
-                    window.location.href = 'food_app_home.html';
-                }
-            } else {
-                window.location.href = 'food_app_home.html';
-            }
+            history.back();
         });
 
         const favorites = Object.keys(localStorage)
@@ -124,9 +78,6 @@
                 emptyStateLink.addEventListener('click', function(e) {
                     e.preventDefault();
                     const targetUrl = emptyStateLink.getAttribute('href');
-                    if (window.navigationStack) {
-                        window.navigationStack.push(window.location.href);
-                    }
                     window.location.href = targetUrl;
                 });
             }
@@ -149,14 +100,12 @@
                 card.addEventListener('click', function(e) {
                     e.preventDefault();
                     const targetUrl = card.getAttribute('href');
-                    if (window.navigationStack) {
-                        window.navigationStack.push(window.location.href);
-                    }
                     window.location.href = targetUrl;
                 });
                 favoritesGrid.appendChild(card);
             });
         }
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>美食APP - 我的菜谱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .top-bar {
+            width: 100%;
+            height: 60px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .back-button {
+            width: 40px;
+            height: 40px;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .back-button::after {
+            content: '';
+            width: 16px;
+            height: 12px;
+            background-color: #000000;
+            clip-path: polygon(100% 40%, 40% 40%, 40% 0%, 0% 50%, 40% 100%, 40% 60%, 100% 60%);
+        }
+        .top-bar .title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+        }
+        .basic-info {
+            padding: 20px;
+            background-color: #ffffff;
+            margin-bottom: 1px;
+        }
+        .recipe-hero {
+            width: 100%;
+            height: 220px;
+            background-size: cover;
+            background-position: center;
+            background-color: #e0e0e0;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .recipe-hero .category-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .recipe-title {
+            color: #000000;
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .recipe-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: #888888;
+            font-size: 14px;
+        }
+        .recipe-meta .tag {
+            background-color: #f5f5f5;
+            padding: 4px 12px;
+            border-radius: 12px;
+            color: #555;
+        }
+        .recipe-meta .tag.highlight {
+            background-color: #fff7e7;
+            color: #d87f2a;
+        }
+        .section {
+            padding: 20px;
+            background-color: #ffffff;
+            margin-bottom: 1px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .section-header .title {
+            color: #000000;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .section-header .count {
+            color: #f2c94c;
+            font-size: 14px;
+        }
+        .ingredient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .ingredient-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+        }
+        .ingredient-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .ingredient-name {
+            flex: 1;
+            color: #000000;
+            font-size: 15px;
+        }
+        .ingredient-amount {
+            color: #888888;
+            font-size: 14px;
+        }
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .step-item {
+            display: flex;
+            gap: 12px;
+        }
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #f2c94c;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .step-text {
+            flex: 1;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+            padding-top: 4px;
+        }
+        .function-buttons {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: #ffffff;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 1px;
+        }
+        .function-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .function-item .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .function-item .text {
+            color: #000000;
+            font-size: 12px;
+        }
+        .heart-icon::before { content: '❤'; font-size: 20px; color: #ff6b6b; }
+        .arrow-icon {
+            width: 25px; height: 18px;
+            background-color: #ff6b6b;
+            clip-path: polygon(0 40%, 60% 40%, 60% 0%, 100% 50%, 60% 100%, 60% 60%, 0 60%);
+        }
+        .plus-icon::before, .plus-icon::after {
+            content: ''; position: absolute; background-color: #ff6b6b;
+        }
+        .plus-icon::before { width: 16px; height: 3px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .plus-icon::after { width: 3px; height: 16px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .plus-icon { width: 24px; height: 24px; position: relative; }
+        .error-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: #fff;
+        }
+        .error-container .error-text {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+        .error-container .error-btn {
+            padding: 12px 24px;
+            background-color: #f2c94c;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .ios-indicator {
+            width: 134px;
+            height: 5px;
+            background-color: #000000;
+            border-radius: 2.5px;
+            margin: 8px auto;
+        }
+        .loading-text {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 16px;
+        }
+    </style>
+    <link rel="stylesheet" href="touch.css">
+</head>
+<body>
+    <div class="top-bar">
+        <a href="#" class="back-button" id="backButton"></a>
+        <div class="title">菜谱详情</div>
+    </div>
+
+    <div id="recipeContent" style="display:none;">
+        <div class="recipe-hero" id="recipeHero">
+            <div class="category-badge" id="recipeCategoryBadge">推荐</div>
+        </div>
+        <div class="basic-info">
+            <div class="recipe-title" id="recipeName">-</div>
+            <div class="recipe-meta" id="recipeMeta"></div>
+        </div>
+
+        <div class="function-buttons">
+            <div class="function-item" id="favoriteBtn">
+                <div class="icon"><div class="heart-icon"></div></div>
+                <div class="text">个人收藏</div>
+            </div>
+            <div class="function-item" id="cookBtn">
+                <div class="icon"><div class="arrow-icon"></div></div>
+                <div class="text">开始做饭</div>
+            </div>
+            <div class="function-item" id="scheduleBtn">
+                <div class="icon"><div class="plus-icon"></div></div>
+                <div class="text">加入日程</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="title">食材</div>
+                <div class="count" id="ingredientCount">0种</div>
+            </div>
+            <div class="ingredient-list" id="ingredientList"></div>
+        </div>
+
+        <div class="section" id="stepsSection">
+            <div class="section-header">
+                <div class="title">制作步骤</div>
+                <div class="count" id="stepCount">0步</div>
+            </div>
+            <div class="steps-list" id="stepsList"></div>
+        </div>
+
+        <div class="ios-indicator"></div>
+    </div>
+
+    <div id="loadingView" class="loading-text">加载中...</div>
+    <div id="errorView" class="error-container" style="display:none;">
+        <div class="error-text" id="errorText">菜谱数据未找到</div>
+        <button class="error-btn" onclick="goHome()">返回首页</button>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="navigation.js"></script>
+    <script>
+
+        function getQueryParam(name) {
+            return new URLSearchParams(window.location.search).get(name) || '';
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        function loadRecipe() {
+            const id = getQueryParam('id');
+            if (!id) {
+                document.getElementById('loadingView').style.display = 'none';
+                document.getElementById('errorView').style.display = 'flex';
+                document.getElementById('errorText').textContent = '缺少菜谱ID';
+                return;
+            }
+
+            const stored = localStorage.getItem('generatedRecipe_' + id);
+            if (!stored) {
+                document.getElementById('loadingView').style.display = 'none';
+                document.getElementById('errorView').style.display = 'flex';
+                document.getElementById('errorText').textContent = '菜谱数据未找到，可能已被清除';
+                return;
+            }
+
+            try {
+                const recipe = JSON.parse(stored);
+                renderRecipe(recipe);
+            } catch (e) {
+                document.getElementById('loadingView').style.display = 'none';
+                document.getElementById('errorView').style.display = 'flex';
+                document.getElementById('errorText').textContent = '菜谱数据解析失败';
+            }
+        }
+
+        function renderRecipe(recipe) {
+            document.getElementById('loadingView').style.display = 'none';
+            document.getElementById('errorView').style.display = 'none';
+            const content = document.getElementById('recipeContent');
+            content.style.display = 'block';
+
+            // 设置标题
+            document.getElementById('recipeName').textContent = recipe.name || '未知菜谱';
+            document.title = '美食APP - ' + (recipe.name || '菜谱详情');
+
+            // 设置封面图（异步加载真实图片，备用显示 emoji + 渐变）
+            const categoryBg = {
+                '中式': { gradient: 'linear-gradient(135deg, #f8b195 0%, #f67280 50%, #c06c84 100%)', emoji: '🥟' },
+                '西式': { gradient: 'linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3a5 100%)', emoji: '🍝' },
+                '日式': { gradient: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', emoji: '🍣' },
+                '韩式': { gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', emoji: '🥘' },
+                '甜点': { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', emoji: '🍰' }
+            };
+            const catStyle = categoryBg[recipe.category] || { gradient: 'linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%)', emoji: '🍽️' };
+            const heroEl = document.getElementById('recipeHero');
+            heroEl.style.background = catStyle.gradient;
+            heroEl.style.display = 'flex';
+            heroEl.style.alignItems = 'center';
+            heroEl.style.justifyContent = 'center';
+            const heroEmoji = document.createElement('div');
+            heroEmoji.className = 'hero-emoji';
+            heroEmoji.textContent = catStyle.emoji;
+            heroEmoji.style.cssText = 'font-size: 96px; opacity: 0.4; user-select: none;';
+            heroEl.insertBefore(heroEmoji, heroEl.firstChild);
+
+            // 异步加载真实图片（5秒超时）
+            const keyword = encodeURIComponent(recipe.name || '');
+            const controller = new AbortController();
+            var timeoutId = setTimeout(function() { controller.abort(); }, 5000);
+            fetch(backendUrl + '/api/search-image?q=' + keyword, { signal: controller.signal })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    clearTimeout(timeoutId);
+                    if (data.image_url) {
+                        var img = new Image();
+                        img.onload = function() {
+                            heroEl.style.backgroundImage = "url('" + data.image_url + "')";
+                            heroEl.style.backgroundSize = 'cover';
+                            heroEl.style.backgroundPosition = 'center';
+                            var emoji = heroEl.querySelector('.hero-emoji');
+                            if (emoji) emoji.style.display = 'none';
+                        };
+                        img.src = data.image_url;
+                    }
+                })
+                .catch(function() { clearTimeout(timeoutId); });
+            // 分类徽章
+            const badgeEl = document.getElementById('recipeCategoryBadge');
+            if (badgeEl && recipe.category) {
+                badgeEl.textContent = recipe.category;
+                const categoryColors = { '中式': '#f2c94c', '西式': '#ff6b6b', '日式': '#4ecdc4', '韩式': '#a8e6cf', '甜点': '#f2c94c' };
+                badgeEl.style.backgroundColor = categoryColors[recipe.category] || '#f2c94c';
+            }
+
+            // 设置元信息
+            const metaContainer = document.getElementById('recipeMeta');
+            let metaHtml = '';
+            if (recipe.cook_time) metaHtml += `<span class="tag">⏱ ${recipe.cook_time}</span>`;
+            if (recipe.difficulty) metaHtml += `<span class="tag">📊 ${recipe.difficulty}</span>`;
+            if (recipe.calories) metaHtml += `<span class="tag highlight">🔥 ${recipe.calories}</span>`;
+            if (recipe.rating) metaHtml += `<span class="tag">⭐ ${recipe.rating}</span>`;
+            if (recipe.flavor) metaHtml += `<span class="tag">👅 ${recipe.flavor}</span>`;
+            if (recipe.category) metaHtml += `<span class="tag">📂 ${recipe.category}</span>`;
+            metaContainer.innerHTML = metaHtml;
+
+            // 设置食材
+            if (recipe.ingredients && recipe.ingredients.length > 0) {
+                document.getElementById('ingredientCount').textContent = recipe.ingredients.length + '种';
+                const ingredientsHtml = recipe.ingredients.map(ing => `
+                    <div class="ingredient-item">
+                        <div class="ingredient-icon">${ing.emoji || '🥘'}</div>
+                        <div class="ingredient-name">${ing.name}</div>
+                        <div class="ingredient-amount">${ing.amount || ''}</div>
+                    </div>
+                `).join('');
+                document.getElementById('ingredientList').innerHTML = ingredientsHtml;
+            } else {
+                document.getElementById('ingredientCount').textContent = '0种';
+                document.getElementById('ingredientList').innerHTML = '<div style="color:#888;font-size:14px;text-align:center;padding:20px;">暂无食材信息</div>';
+            }
+
+            // 设置步骤
+            if (recipe.steps && recipe.steps.length > 0) {
+                document.getElementById('stepsSection').style.display = 'block';
+                document.getElementById('stepCount').textContent = recipe.steps.length + '步';
+                const stepsHtml = recipe.steps.map((step, i) => `
+                    <div class="step-item">
+                        <div class="step-number">${i + 1}</div>
+                        <div class="step-text">${step}</div>
+                    </div>
+                `).join('');
+                document.getElementById('stepsList').innerHTML = stepsHtml;
+            } else {
+                document.getElementById('stepsSection').style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecipe();
+
+            // 返回按钮
+            document.getElementById('backButton').addEventListener('click', function(e) {
+                e.preventDefault();
+                history.back();
+            });
+
+            // 开始做饭
+            document.getElementById('cookBtn').addEventListener('click', function() {
+                window.location.href = 'food_app_video_call.html';
+            });
+        });
+    </script>
+    <script src="touch.js"></script>
+</body>
+</html>

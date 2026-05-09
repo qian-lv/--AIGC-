@@ -6,7 +6,7 @@
     <title>美食APP - 设置</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #f0f0f0; font-family: "Helvetica Neue", Arial, sans-serif; color: #3a3a3a; min-height: 100vh; max-width: 414px; max-height: 896px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        body { background-color: #f0f0f0; font-family: "Helvetica Neue", Arial, sans-serif; color: #3a3a3a; min-height: 100dvh; width: 100%; }
         .header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: #ffffff; box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
         .back-button { width: 42px; height: 42px; border-radius: 50%; background: #fff4e3; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #3a3a3a; }
         .back-button::after { content: ''; display: inline-block; width: 10px; height: 18px; border-left: 2px solid #3a3a3a; border-bottom: 2px solid #3a3a3a; transform: rotate(45deg); }
@@ -30,6 +30,7 @@
         .shortcut-item span:first-child { font-weight: 600; }
         .footer { padding: 0 20px 30px; }
     </style>
+    <link rel="stylesheet" href="touch.css">
 </head>
 <body>
     <div class="header">
@@ -87,58 +88,11 @@
     <div class="footer"></div>
     <script src="navigation.js"></script>
     <script>
-        // 确保导航栈是一个有效的实例
-        if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
-            window.navigationStack = {
-                stack: [],
-                push: function(url) {
-                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
-                        console.log('页面已在栈顶，无需重复压入:', url);
-                        return;
-                    }
-                    if (this.stack.length >= 10) {
-                        this.stack.shift();
-                    }
-                    this.stack.push(url);
-                    localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                    console.log('压入页面:', url, '当前栈:', this.stack);
-                },
-                pop: function() {
-                    if (this.stack.length > 1) {
-                        this.stack.pop();
-                        const previousUrl = this.stack[this.stack.length - 1];
-                        localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
-                        return previousUrl;
-                    }
-                    console.log('栈为空或只有一个页面，无法返回');
-                    return null;
-                },
-                getStack: function() {
-                    return this.stack;
-                }
-            };
-        }
-        
-        // 确保当前页面在导航栈中
-        const currentUrl = window.location.href;
-        if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
-            window.navigationStack.push(currentUrl);
-        }
         
         const backButton = document.getElementById('backButton');
         backButton.addEventListener('click', function(e) {
             e.preventDefault();
-            if (window.navigationStack) {
-                const previousUrl = window.navigationStack.pop();
-                if (previousUrl) {
-                    window.location.href = previousUrl;
-                } else {
-                    window.location.href = 'food_app_home.html';
-                }
-            } else {
-                window.location.href = 'food_app_home.html';
-            }
+            history.back();
         });
         
         // 为设置卡片链接添加导航栈处理
@@ -147,12 +101,10 @@
             card.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetUrl = card.getAttribute('href');
-                if (window.navigationStack) {
-                    window.navigationStack.push(window.location.href);
-                }
                 window.location.href = targetUrl;
             });
         });
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>

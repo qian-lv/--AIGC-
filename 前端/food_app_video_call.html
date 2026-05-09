@@ -2,246 +2,859 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>视频通话</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>糯糯语音做饭智能体</title>
+    <script src="navigation.js"></script>
+    <link rel="stylesheet" href="touch.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #fff8ed;
+            --card: rgba(255,255,255,0.92);
+            --ink: #2b2118;
+            --muted: #7f6b58;
+            --brand: #ff9f43;
+            --brand-dark: #e8762b;
+            --soft: #ffe8c8;
+            --green: #28b463;
+            --red: #ff5a4f;
+            --shadow: 0 18px 38px rgba(142, 93, 44, 0.16);
         }
-
         body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+            background: #f1f1f1;
             width: 414px;
             height: 896px;
             margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: var(--ink);
+            box-shadow: 0 0 18px rgba(0,0,0,0.12);
         }
-
         .container {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 20% 8%, rgba(255,214,141,0.62), transparent 28%),
+                radial-gradient(circle at 88% 18%, rgba(255,181,108,0.35), transparent 24%),
+                linear-gradient(180deg, #fff8ed 0%, #fffdf8 62%, #fff4e5 100%);
         }
-
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            background-color: #2962FF;
-            border: none;
+        .topbar {
+            height: 72px;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            padding: 18px 18px 8px;
+            flex-shrink: 0;
+        }
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.88);
+            box-shadow: 0 8px 18px rgba(122,82,33,0.12);
+            color: #6b4220;
+            font-size: 24px;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(41, 98, 255, 0.3);
-            transition: transform 0.2s ease;
-            z-index: 10;
         }
-
-        .back-btn:hover {
-            transform: scale(1.05);
+        .title-wrap { text-align: center; line-height: 1.2; }
+        .title-wrap h1 { font-size: 18px; letter-spacing: 0.5px; }
+        .title-wrap p { margin-top: 4px; font-size: 12px; color: var(--muted); }
+        .agent-card {
+            margin: 4px 18px 10px;
+            padding: 16px;
+            border-radius: 26px;
+            background: var(--card);
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
         }
-
-        .back-btn span {
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
+        .media-shell {
+            position: relative;
+            width: 112px;
+            height: 112px;
+            border-radius: 28px;
+            overflow: hidden;
+            background: #fff4df;
+            border: 4px solid #fff;
+            box-shadow: 0 14px 30px rgba(186,112,39,0.18);
+            flex-shrink: 0;
         }
-
-        .avatar-section {
+        .media-shell.speaking { box-shadow: 0 0 0 8px rgba(255,159,67,0.14), 0 18px 34px rgba(186,112,39,0.22); }
+        .media-shell.speaking::after {
+            content: "";
+            position: absolute;
+            inset: -6px;
+            border: 2px solid rgba(255,159,67,0.55);
+            border-radius: 32px;
+            animation: pulse 1.35s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.25; }
+            50% { transform: scale(1.04); opacity: 0.75; }
+            100% { transform: scale(0.95); opacity: 0.25; }
+        }
+        .media-shell img,
+        .media-shell video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .media-shell video { display: none; }
+        .live-pill {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.9);
+            color: #8a5224;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .agent-info { flex: 1; min-width: 0; }
+        .agent-name { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+        .agent-desc { font-size: 13px; color: var(--muted); line-height: 1.45; }
+        .status-line {
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 26px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #fff4df;
+            color: #7d4e22;
+            font-size: 12px;
+            font-weight: 650;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #b8a28d;
+        }
+        .dot.on { background: var(--green); box-shadow: 0 0 0 5px rgba(40,180,99,0.12); }
+        .dot.wait { background: var(--brand); box-shadow: 0 0 0 5px rgba(255,159,67,0.12); }
+        .chat-panel {
             flex: 1;
+            min-height: 0;
+            margin: 0 18px 10px;
+            padding: 14px;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.76);
+            box-shadow: inset 0 0 0 1px rgba(255,218,174,0.72);
+            overflow-y: auto;
+        }
+        .msg {
+            max-width: 86%;
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border-radius: 17px;
+            font-size: 14px;
+            line-height: 1.55;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .msg.agent {
+            background: #fff;
+            border-top-left-radius: 6px;
+            color: #3a2a1e;
+            box-shadow: 0 8px 18px rgba(142,93,44,0.08);
+        }
+        .msg.user {
+            margin-left: auto;
+            background: linear-gradient(135deg, #ffc46f, #ff9f43);
+            border-top-right-radius: 6px;
+            color: #2b1808;
+            font-weight: 600;
+        }
+        .msg.system {
+            margin: 0 auto 12px;
+            max-width: 94%;
+            background: rgba(255,244,223,0.9);
+            color: #7f6b58;
+            text-align: center;
+            font-size: 12px;
+            border-radius: 999px;
+        }
+        .voice-bar {
+            flex-shrink: 0;
+            min-height: 52px;
+            margin: 0 18px 8px;
+            padding: 8px 12px;
+            border-radius: 17px;
+            background: rgba(255,255,255,0.82);
+            color: #8b765f;
+            font-size: 12px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            gap: 6px;
         }
-
-        .avatar-wrap {
-            position: relative;
-            width: 120px;
-            height: 120px;
+        .voice-row { display: flex; align-items: center; gap: 8px; }
+        .voice-row strong { color: #6b4220; flex-shrink: 0; }
+        .voice-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .meter {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(127,107,88,0.13);
+            overflow: hidden;
         }
-
-        .avatar-halo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background-color: #FFF3CD;
-            animation: breathing 2s ease-in-out infinite;
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ffd27f, #ff9f43);
+            transition: width 0.08s linear;
         }
-
-        @keyframes breathing {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                opacity: 0.6;
-                transform: translate(-50%, -50%) scale(1.15);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: #E0E0E0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .ringing {
-            margin-top: 30px;
-            color: #9E9E9E;
-            font-size: 18px;
-            font-family: Arial, sans-serif;
-        }
-
-        .buttons {
+        .text-input-row {
+            flex-shrink: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            padding-bottom: 80px;
+            gap: 8px;
+            padding: 0 18px 10px;
         }
-
-        .btn {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
+        .text-input-row input {
+            flex: 1;
+            height: 44px;
+            border: 1px solid rgba(242,196,76,0.45);
+            border-radius: 16px;
+            padding: 0 12px;
+            outline: none;
+            background: rgba(255,255,255,0.9);
+            color: var(--ink);
+            font-size: 14px;
+        }
+        .text-input-row button {
+            width: 70px;
+            height: 44px;
             border: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 36px;
-            transition: transform 0.2s ease;
-        }
-
-        .btn:hover {
-            transform: scale(1.08);
-        }
-
-        .btn-video {
-            background-color: #2962FF;
-        }
-
-        .btn-mic {
-            background-color: #FFFFFF;
-            border: 1px solid #ddd;
-        }
-
-        .btn-hangup {
-            background-color: #FF7043;
-        }
-
-        .btn-hangup a {
+            border-radius: 16px;
             color: white;
-            text-decoration: none;
+            background: linear-gradient(135deg, #ffb452, #ff8f2f);
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .controls {
+            height: 108px;
+            flex-shrink: 0;
+            padding: 8px 24px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(255,248,237,0), rgba(255,248,237,0.96) 28%, rgba(255,248,237,1));
+        }
+        .control-btn {
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(122,82,33,0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 4px;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+        }
+        .control-btn:hover { transform: translateY(-2px); }
+        .control-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .control-btn .icon { font-size: 25px; line-height: 1; }
+        .control-btn .label { font-size: 11px; font-weight: 800; }
+        .start-btn { width: 118px; height: 68px; color: #fff; background: linear-gradient(135deg, #34c96b, #1a9f4f); }
+        .mic-btn { width: 76px; height: 68px; color: #6b4220; background: #fff; }
+        .mic-btn.active { color: #fff; background: linear-gradient(135deg, #ffb452, #ff8f2f); }
+        .hangup-btn { width: 76px; height: 68px; color: #fff; background: linear-gradient(135deg, #ff6b5f, #ef3d35); }
+        .toast {
+            position: absolute;
+            left: 28px;
+            right: 28px;
+            bottom: 122px;
+            padding: 11px 14px;
+            border-radius: 16px;
+            background: rgba(43,33,24,0.9);
+            color: white;
+            font-size: 13px;
+            line-height: 1.45;
+            display: none;
+            z-index: 20;
+        }
+        @media (max-width: 414px) {
+            body { width: 100vw; height: 100vh; }
         }
     </style>
-    <script src="navigation.js"></script>
 </head>
 <body>
     <div class="container">
-        <button class="back-btn" id="backButton">
-            <span>←</span>
-        </button>
-
-        <div class="avatar-section">
-            <div class="avatar-wrap">
-                <div class="avatar-halo"></div>
-                <div class="avatar"></div>
+        <div class="topbar">
+            <button class="back-btn" id="backButton" aria-label="返回">←</button>
+            <div class="title-wrap">
+                <h1>语音做饭智能体</h1>
+                <p>麦克风 Blob · 百度 ASR · DeepSeek · 语音回复</p>
             </div>
-            <div class="ringing">Ringing...</div>
+            <div style="width:44px"></div>
         </div>
 
-        <div class="buttons">
-            <button class="btn btn-video">📹</button>
-            <button class="btn btn-mic">🎤</button>
-            <button class="btn btn-hangup" id="hangupBtn">📞</button>
+        <section class="agent-card">
+            <div class="media-shell" id="mediaShell">
+                <img id="agentImage" src="assets/agent_raccoon.png" alt="糯糯静态形象">
+                <video id="agentVideo" src="assets/agent_speaking.mp4" muted loop playsinline preload="auto"></video>
+                <div class="live-pill" id="livePill">待机中</div>
+            </div>
+            <div class="agent-info">
+                <div class="agent-name">糯糯 · 小浣熊厨友</div>
+                <div class="agent-desc" id="recipeDesc">我会陪你一步一步做饭。你说"好了""下一步""慢一点"都可以。</div>
+                <div class="status-line"><span class="dot" id="statusDot"></span><span id="callStatus">点击"开始通话"后开启语音陪做</span></div>
+            </div>
+        </section>
+
+        <main class="chat-panel" id="chatLog"></main>
+
+        <div class="voice-bar">
+            <div class="voice-row"><strong>麦克风：</strong><span id="voiceDebug">还没有开始采集</span></div>
+            <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
         </div>
+
+        <div class="text-input-row">
+            <input id="textInput" type="text" placeholder="也可以打字：比如"我切好了，下一步"">
+            <button id="sendTextBtn">发送</button>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn start-btn" id="startCallBtn">
+                <span class="icon">🦝</span>
+                <span class="label">开始通话</span>
+            </button>
+            <button class="control-btn mic-btn" id="micBtn">
+                <span class="icon" id="micIcon">🎤</span>
+                <span class="label" id="micLabel">麦克风</span>
+            </button>
+            <button class="control-btn hangup-btn" id="hangupBtn">
+                <span class="icon">📞</span>
+                <span class="label">结束</span>
+            </button>
+        </div>
+        <div class="toast" id="toast"></div>
     </div>
+
     <script>
-        // 确保导航栈是一个有效的实例
         if (!window.navigationStack || typeof window.navigationStack.push !== 'function') {
             window.navigationStack = {
-                stack: [],
+                stack: JSON.parse(localStorage.getItem('navigationStack') || '[]'),
                 push: function(url) {
-                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) {
-                        console.log('页面已在栈顶，无需重复压入:', url);
-                        return;
-                    }
-                    if (this.stack.length >= 10) {
-                        this.stack.shift();
-                    }
+                    if (this.stack.length > 0 && this.stack[this.stack.length - 1] === url) return;
+                    if (this.stack.length >= 10) this.stack.shift();
                     this.stack.push(url);
                     localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                    console.log('压入页面:', url, '当前栈:', this.stack);
                 },
                 pop: function() {
                     if (this.stack.length > 1) {
                         this.stack.pop();
                         const previousUrl = this.stack[this.stack.length - 1];
                         localStorage.setItem('navigationStack', JSON.stringify(this.stack));
-                        console.log('弹出页面，返回:', previousUrl, '当前栈:', this.stack);
                         return previousUrl;
                     }
-                    console.log('栈为空或只有一个页面，无法返回');
                     return null;
-                },
-                getStack: function() {
-                    return this.stack;
                 }
             };
         }
-        
-        // 确保当前页面在导航栈中
         const currentUrl = window.location.href;
         if (window.navigationStack.stack.length === 0 || window.navigationStack.stack[window.navigationStack.stack.length - 1] !== currentUrl) {
             window.navigationStack.push(currentUrl);
         }
-        
-        document.getElementById('hangupBtn').addEventListener('click', function() {
-            if (window.navigationStack) {
-                window.navigationStack.push(window.location.href);
+
+        const API_BASE_URL = localStorage.getItem('FOOD_AI_API_BASE') || 'http://127.0.0.1:8085';
+        const TARGET_SAMPLE_RATE = 16000;
+        const START_RMS = 0.010;
+        const CONTINUE_RMS = 0.0065;
+        const END_SILENCE_MS = 850;
+        const MIN_SEGMENT_MS = 430;
+        const MAX_SEGMENT_MS = 7600;
+        const PREROLL_BUFFER_COUNT = 8;
+
+        const chatLog = document.getElementById('chatLog');
+        const callStatus = document.getElementById('callStatus');
+        const statusDot = document.getElementById('statusDot');
+        const voiceDebug = document.getElementById('voiceDebug');
+        const meterFill = document.getElementById('meterFill');
+        const textInput = document.getElementById('textInput');
+        const sendTextBtn = document.getElementById('sendTextBtn');
+        const startCallBtn = document.getElementById('startCallBtn');
+        const micBtn = document.getElementById('micBtn');
+        const micIcon = document.getElementById('micIcon');
+        const micLabel = document.getElementById('micLabel');
+        const hangupBtn = document.getElementById('hangupBtn');
+        const backButton = document.getElementById('backButton');
+        const mediaShell = document.getElementById('mediaShell');
+        const agentImage = document.getElementById('agentImage');
+        const agentVideo = document.getElementById('agentVideo');
+        const livePill = document.getElementById('livePill');
+        const recipeDesc = document.getElementById('recipeDesc');
+        const toast = document.getElementById('toast');
+
+        let callStarted = false;
+        let listening = false;
+        let waitingReply = false;
+        let agentSpeaking = false;
+        let conversationHistory = [];
+
+        let audioContext = null;
+        let mediaStream = null;
+        let sourceNode = null;
+        let processorNode = null;
+        let audioInputSampleRate = 48000;
+        let vadActive = false;
+        let preRollBuffers = [];
+        let segmentBuffers = [];
+        let segmentStartTime = 0;
+        let silenceStartTime = 0;
+        let lastMeterUpdate = 0;
+        let lastSpeechSendTime = 0;
+
+        function loadRecipeContext() {
+            try { return JSON.parse(localStorage.getItem('currentCookingRecipe') || '{}'); }
+            catch (e) { return {}; }
+        }
+        const recipeContext = loadRecipeContext();
+        if (recipeContext.title) {
+            const ingredients = Array.isArray(recipeContext.ingredients) ? recipeContext.ingredients.slice(0, 4).join('、') : '';
+            recipeDesc.textContent = `当前菜谱：${recipeContext.title}${ingredients ? '｜食材：' + ingredients : ''}`;
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            clearTimeout(showToast.timer);
+            showToast.timer = setTimeout(() => { toast.style.display = 'none'; }, 4200);
+        }
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            div.textContent = text;
+            chatLog.appendChild(div);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function setStatus(text, mode) {
+            callStatus.textContent = text;
+            statusDot.className = 'dot' + (mode ? ' ' + mode : '');
+        }
+
+        function setAgentSpeaking(active) {
+            agentSpeaking = active;
+            if (active) {
+                mediaShell.classList.add('speaking');
+                agentImage.style.display = 'none';
+                agentVideo.style.display = 'block';
+                livePill.textContent = '说话中';
+                try {
+                    agentVideo.currentTime = 0;
+                    agentVideo.play().catch(() => {});
+                } catch (e) {}
+            } else {
+                mediaShell.classList.remove('speaking');
+                agentVideo.pause();
+                agentVideo.style.display = 'none';
+                agentImage.style.display = 'block';
+                livePill.textContent = listening ? '倾听中' : '待机中';
             }
-            window.location.href = 'game_app_complete.html';
-        });
-        
-        // 返回按钮点击事件
-        document.getElementById('backButton').addEventListener('click', function() {
+        }
+
+        function cleanSpeechText(text) {
+            return String(text || '')
+                .replace(/[*#_`>\[\]{}]/g, '')
+                .replace(/https?:\/\/\S+/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function speak(text) {
+            const speechText = cleanSpeechText(text);
+            if (!speechText) {
+                setAgentSpeaking(false);
+                setStatus(listening ? '我在听，你可以继续说' : '语音回复完成', listening ? 'on' : '');
+                return;
+            }
+            if (!('speechSynthesis' in window)) {
+                setAgentSpeaking(false);
+                setStatus('浏览器不支持语音播报，但文字回复已显示', 'wait');
+                return;
+            }
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+            setAgentSpeaking(true);
+            setStatus('糯糯正在说话，先听它说完', 'wait');
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.96;
+            utterance.pitch = 1.08;
+            utterance.volume = 1;
+            utterance.onend = () => {
+                setAgentSpeaking(false);
+                setStatus(listening ? '我在听，你可以继续说' : '语音回复完成，可开启麦克风继续', listening ? 'on' : '');
+            };
+            utterance.onerror = () => {
+                setAgentSpeaking(false);
+                setStatus('语音播报被浏览器中断，文字回复仍可查看', 'wait');
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function updateMicUI(active) {
+            micBtn.classList.toggle('active', !!active);
+            micIcon.textContent = active ? '🎙️' : '🎤';
+            micLabel.textContent = active ? '倾听中' : '麦克风';
+            if (!agentSpeaking) livePill.textContent = active ? '倾听中' : '待机中';
+        }
+
+        function calculateRms(buffer) {
+            let sum = 0;
+            let peak = 0;
+            for (let i = 0; i < buffer.length; i++) {
+                const v = buffer[i];
+                sum += v * v;
+                const abs = Math.abs(v);
+                if (abs > peak) peak = abs;
+            }
+            return { rms: Math.sqrt(sum / buffer.length), peak };
+        }
+
+        function mergeBuffers(buffers) {
+            const total = buffers.reduce((sum, b) => sum + b.length, 0);
+            const merged = new Float32Array(total);
+            let offset = 0;
+            for (const b of buffers) {
+                merged.set(b, offset);
+                offset += b.length;
+            }
+            return merged;
+        }
+
+        function resampleLinear(input, inputSampleRate, outputSampleRate) {
+            if (inputSampleRate === outputSampleRate) return input;
+            const ratio = inputSampleRate / outputSampleRate;
+            const outputLength = Math.max(1, Math.round(input.length / ratio));
+            const output = new Float32Array(outputLength);
+            for (let i = 0; i < outputLength; i++) {
+                const pos = i * ratio;
+                const index = Math.floor(pos);
+                const frac = pos - index;
+                const s1 = input[index] || 0;
+                const s2 = input[index + 1] || s1;
+                output[i] = s1 + (s2 - s1) * frac;
+            }
+            return output;
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+        }
+
+        function encodeWav(samples, sampleRate) {
+            const buffer = new ArrayBuffer(44 + samples.length * 2);
+            const view = new DataView(buffer);
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + samples.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, samples.length * 2, true);
+            let offset = 44;
+            for (let i = 0; i < samples.length; i++, offset += 2) {
+                const s = Math.max(-1, Math.min(1, samples[i]));
+                view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+            }
+            return buffer;
+        }
+
+        function resetVad() {
+            vadActive = false;
+            preRollBuffers = [];
+            segmentBuffers = [];
+            segmentStartTime = 0;
+            silenceStartTime = 0;
+        }
+
+        function finalizeSegment(reason) {
+            if (!vadActive || segmentBuffers.length === 0) {
+                resetVad();
+                return;
+            }
+            const now = Date.now();
+            const durationMs = now - segmentStartTime;
+            const buffers = segmentBuffers.slice();
+            resetVad();
+
+            if (durationMs < MIN_SEGMENT_MS) {
+                voiceDebug.textContent = '声音太短，已忽略。请说完整一句话。';
+                return;
+            }
+            if (waitingReply || agentSpeaking) return;
+            const raw = mergeBuffers(buffers);
+            const resampled = resampleLinear(raw, audioInputSampleRate, TARGET_SAMPLE_RATE);
+            const wavBuffer = encodeWav(resampled, TARGET_SAMPLE_RATE);
+            const blob = new Blob([wavBuffer], { type: 'audio/wav' });
+            lastSpeechSendTime = Date.now();
+            sendVoiceBlob(blob, { durationMs, reason, bytes: blob.size });
+        }
+
+        async function ensureAudioCapture() {
+            if (audioContext && processorNode && mediaStream) return true;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast('当前浏览器不支持麦克风采集，请使用新版 Chrome 或 Edge。');
+                setStatus('浏览器不支持麦克风采集', 'wait');
+                return false;
+            }
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioInputSampleRate = audioContext.sampleRate || 48000;
+                sourceNode = audioContext.createMediaStreamSource(mediaStream);
+                processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+                processorNode.onaudioprocess = handleAudioProcess;
+                sourceNode.connect(processorNode);
+                processorNode.connect(audioContext.destination);
+                voiceDebug.textContent = `麦克风已接入，采样率 ${audioInputSampleRate}Hz，前端会转成 16k WAV Blob`;
+                return true;
+            } catch (error) {
+                listening = false;
+                updateMicUI(false);
+                setStatus('无法获取麦克风权限', 'wait');
+                showToast('无法获取麦克风：' + error.message + '。请在浏览器地址栏允许麦克风。');
+                return false;
+            }
+        }
+
+        function handleAudioProcess(event) {
+            const input = event.inputBuffer.getChannelData(0);
+            const chunk = new Float32Array(input.length);
+            chunk.set(input);
+
+            const { rms, peak } = calculateRms(chunk);
+            const now = Date.now();
+            if (now - lastMeterUpdate > 90) {
+                lastMeterUpdate = now;
+                const level = Math.min(100, Math.round(rms * 1600));
+                meterFill.style.width = level + '%';
+                const state = vadActive ? '正在收音' : (listening ? '等待你说话' : '麦克风关闭');
+                voiceDebug.textContent = `${state}｜RMS ${rms.toFixed(4)}｜峰值 ${peak.toFixed(3)}`;
+            }
+
+            if (!listening || waitingReply || agentSpeaking) return;
+            if (now - lastSpeechSendTime < 700) return;
+
+            preRollBuffers.push(chunk);
+            if (preRollBuffers.length > PREROLL_BUFFER_COUNT) preRollBuffers.shift();
+
+            if (!vadActive && rms >= START_RMS) {
+                vadActive = true;
+                segmentStartTime = now;
+                silenceStartTime = 0;
+                segmentBuffers = preRollBuffers.slice();
+                preRollBuffers = [];
+                setStatus('听到声音了，正在收音...', 'on');
+            }
+
+            if (vadActive) {
+                segmentBuffers.push(chunk);
+                const segmentDuration = now - segmentStartTime;
+                if (rms < CONTINUE_RMS) {
+                    if (!silenceStartTime) silenceStartTime = now;
+                } else {
+                    silenceStartTime = 0;
+                }
+                if (silenceStartTime && now - silenceStartTime >= END_SILENCE_MS) {
+                    finalizeSegment('silence');
+                } else if (segmentDuration >= MAX_SEGMENT_MS) {
+                    finalizeSegment('max_duration');
+                }
+            }
+        }
+
+        async function startListening() {
+            const ok = await ensureAudioCapture();
+            if (!ok) return;
+            if (audioContext && audioContext.state === 'suspended') await audioContext.resume();
+            listening = true;
+            resetVad();
+            updateMicUI(true);
+            setStatus(agentSpeaking ? '糯糯正在说话，等它说完再说' : '我在听，你可以直接说话', agentSpeaking ? 'wait' : 'on');
+            voiceDebug.textContent = '麦克风已开启，说完一句话后会自动上传内存 Blob 识别。';
+        }
+
+        function stopListening() {
+            listening = false;
+            resetVad();
+            updateMicUI(false);
+            meterFill.style.width = '0%';
+            voiceDebug.textContent = '麦克风已关闭';
+            setStatus('麦克风已关闭，可打字或重新开启', '');
+        }
+
+        function destroyAudioCapture() {
+            try { if (processorNode) processorNode.disconnect(); } catch (e) {}
+            try { if (sourceNode) sourceNode.disconnect(); } catch (e) {}
+            try { if (mediaStream) mediaStream.getTracks().forEach(track => track.stop()); } catch (e) {}
+            try { if (audioContext) audioContext.close(); } catch (e) {}
+            processorNode = null;
+            sourceNode = null;
+            mediaStream = null;
+            audioContext = null;
+            resetVad();
+        }
+
+        async function sendVoiceBlob(blob, stats) {
+            if (!blob || waitingReply) return;
+            waitingReply = true;
+            setStatus('语音已发送，百度正在转文字...', 'wait');
+            voiceDebug.textContent = `已上传内存 WAV Blob：${Math.round(blob.size / 1024)}KB，${Math.round(stats.durationMs)}ms`;
+
+            try {
+                const form = new FormData();
+                form.append('audio', blob, 'speech.wav');
+                form.append('history', JSON.stringify(conversationHistory.slice(-14)));
+                form.append('recipe_context', JSON.stringify(recipeContext || {}));
+                form.append('client_stats', JSON.stringify(stats || {}));
+
+                const response = await fetch(`${API_BASE_URL}/api/cooking-voice`, {
+                    method: 'POST',
+                    body: form
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || !data.reply) {
+                    throw new Error(data.error || '后端没有返回有效回复');
+                }
+
+                const userText = String(data.asr_text || '').trim();
+                const reply = String(data.reply || '').trim();
+                if (userText) {
+                    appendMessage('user', userText);
+                    conversationHistory.push({ role: 'user', content: userText });
+                }
+                appendMessage('agent', reply);
+                conversationHistory.push({ role: 'assistant', content: reply });
+                waitingReply = false;
+                speak(reply);
+            } catch (error) {
+                waitingReply = false;
+                const tip = '语音识别或智能体回复失败：' + error.message;
+                appendMessage('agent', tip);
+                setStatus('语音识别失败，可再说一次或使用文字输入', 'wait');
+                showToast(error.message);
+            }
+        }
+
+        async function sendUserMessage(text) {
+            const message = String(text || '').trim();
+            if (!message || waitingReply) return;
+            appendMessage('user', message);
+            conversationHistory.push({ role: 'user', content: message });
+            waitingReply = true;
+            resetVad();
+            setStatus('糯糯正在想下一步...', 'wait');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/cooking-agent`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message,
+                        history: conversationHistory.slice(-14),
+                        recipe_context: recipeContext
+                    })
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || !data.reply) throw new Error(data.error || '后端没有返回有效回复');
+                const reply = data.reply.trim();
+                appendMessage('agent', reply);
+                conversationHistory.push({ role: 'assistant', content: reply });
+                waitingReply = false;
+                speak(reply);
+            } catch (error) {
+                waitingReply = false;
+                const tip = '我这边连接后端失败了：' + error.message + '。你可以检查 FastAPI 后端、百度 ASR 和 DeepSeek API Key。';
+                appendMessage('agent', tip);
+                setStatus('后端连接失败，可继续用文字查看错误', 'wait');
+                showToast(error.message);
+            }
+        }
+
+        async function startCall() {
+            if (callStarted) {
+                await startListening();
+                return;
+            }
+            callStarted = true;
+            startCallBtn.querySelector('.label').textContent = '继续听';
+            await startListening();
+            const title = recipeContext.title || '这道菜';
+            const greet = `你好呀，我是糯糯。接下来我会陪你一步一步做${title}，不着急，我们慢慢来。准备好了就对我说"开始"或者"下一步"。`;
+            appendMessage('agent', greet);
+            conversationHistory.push({ role: 'assistant', content: greet });
+            speak(greet);
+        }
+
+        function sendTypedText() {
+            const value = textInput.value.trim();
+            if (!value) return;
+            textInput.value = '';
+            sendUserMessage(value);
+        }
+
+        function goBack() {
+            try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {}
+            stopListening();
+            destroyAudioCapture();
             if (window.navigationStack) {
                 const previousUrl = window.navigationStack.pop();
                 if (previousUrl) {
                     window.location.href = previousUrl;
-                } else {
-                    window.location.href = 'food_app_home.html';
+                    return;
                 }
-            } else {
-                window.location.href = 'food_app_home.html';
             }
-        });
+            window.location.href = 'food_app_home.html';
+        }
+
+        function hangup() {
+            try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {}
+            stopListening();
+            destroyAudioCapture();
+            if (window.navigationStack) window.navigationStack.push(window.location.href);
+            window.location.href = 'game_app_complete.html';
+        }
+
+        startCallBtn.addEventListener('click', startCall);
+        micBtn.addEventListener('click', async () => listening ? stopListening() : await startListening());
+        sendTextBtn.addEventListener('click', sendTypedText);
+        textInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendTypedText(); });
+        backButton.addEventListener('click', goBack);
+        hangupBtn.addEventListener('click', hangup);
+
+        appendMessage('system', '提示：本页面不保存音频文件；麦克风声音只会临时变成内存 WAV Blob，传给后端识别。');
+        appendMessage('agent', '点击底部"开始通话"，允许麦克风后，我会用语音陪你做饭。');
     </script>
+    <script src="touch.js"></script>
 </body>
 </html>
